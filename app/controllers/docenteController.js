@@ -8,7 +8,8 @@ const { Op } = require('sequelize')
 module.exports = {
     findAll,
     findBy,
-    insert
+    insert,
+    findAllBy,
 }
 
 async function insert(req, res) {
@@ -55,6 +56,18 @@ async function findBy(req, res) {
                 telefono: data[0].telefono
             }
             res.status(201).send(newData);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Sucedio un error al obtener los registros de Docentees"
+            })
+        })
+}
+
+async function findAllBy(req, res) {
+    Docente.findAll({ where: req.query })
+        .then(data => {
+            res.status(201).send(data);
         })
         .catch(err => {
             res.status(500).send({
