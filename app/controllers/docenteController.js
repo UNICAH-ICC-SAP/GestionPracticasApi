@@ -50,7 +50,10 @@ async function findAll(req, res) {
 }
 
 async function findBy(req, res) {
-    Docente.findAll({ where: req.query })
+    Docente.findAll({ 
+        where: req.query,
+        include: [{ model: Facultad }]
+    })
         .then(data => {
             const newData = {
                 userId: data[0].docenteId,
@@ -63,7 +66,7 @@ async function findBy(req, res) {
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || "Sucedio un error al obtener los registros de Docentees"
+                message: err.message || "Sucedio un error al obtener los registros de Docentes"
             })
         })
 }
