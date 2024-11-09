@@ -10,8 +10,16 @@ module.exports = (sequelize) => {
         },
         alumnoId: {
             type: DataTypes.STRING(13)
+        },
+        idEstadoTerna: {
+            type: DataTypes.INTEGER,
+            allowNull: false, // Asumiendo que este campo es obligatorio
+            defaultValue: 1, // Asumiendo que el valor por defecto es 1 (ok)
+            validate: {
+                isIn: [[1, 2, 3]] // Validación para los tres estados: 1, 2, 3
+            }
         }
-    }
+    };    
     const options = {
         defaultScope: {
             //TODO: Exclude attributes by default here

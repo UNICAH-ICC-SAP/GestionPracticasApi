@@ -23,7 +23,8 @@ async function signUp(req, res) {
     User.create({
         userId: req.body['userId'],
         pass: newPass,
-        roleId: req.body['roleId']
+        roleId: req.body['roleId'],
+        passwordResetRequired: req.body['passwordResetRequired']
     })
         .then(data => {
             res.status(200).send(data);
@@ -33,6 +34,7 @@ async function signUp(req, res) {
                 message:
                     err.message || "Sucedio un error al obtener los registros de actores"
             });
+            console.log(err)
         });
 };
 
