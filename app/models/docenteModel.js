@@ -18,7 +18,7 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING(5)
         },
         telefono: {
-            type: DataTypes.STRING(9)
+            type: DataTypes.STRING(15)
         },
         estadoDocente: {
             type: DataTypes.BOOLEAN

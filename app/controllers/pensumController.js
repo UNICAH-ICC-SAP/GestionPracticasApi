@@ -7,9 +7,11 @@ const { Op } = require('sequelize')
 
 module.exports = {
     get,
+    getPensumBy,
     insert,
     update,
-    updateStatus
+    updateStatus,
+    getClassBy
 }
 
 async function get(req, res) {
@@ -23,6 +25,29 @@ async function get(req, res) {
             });
         });
 }
+
+async function getClassBy(req, res) {
+    const { id_carrera } = req.query;
+
+    try {
+        const clases = await CarreraClaseBloque.findAll({
+            where: { id_carrera: id_carrera },
+            include: [{
+                model: Pensum,
+                as: 'clase', 
+                attributes: ['id_clase', 'nombre_clase', 'creditos', 'estado', 'es_lab']
+            }]
+        });
+
+        res.status(200).send(clases);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: err.message || "Sucedió un error al obtener las clases por carrera"
+        });
+    }
+}
+
 
 
 async function insert(req, res) {
