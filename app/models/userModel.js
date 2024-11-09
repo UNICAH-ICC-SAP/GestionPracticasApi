@@ -13,6 +13,9 @@ module.exports = (sequelize) => {
         },
         roleId: {
             type: DataTypes.INTEGER
+        },
+        passwordResetRequired: {
+            type: DataTypes.BOOLEAN
         }
     }
     const options = {

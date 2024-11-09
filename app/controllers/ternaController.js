@@ -17,6 +17,7 @@ async function insert(req, res) {
     const terna = req.body;
     Terna.create({
         alumnoId: terna.alumnoId,
+        idEstadoTerna: terna.idEstadoTerna,
     }).then(data => {
         res.status(200).send(data);
     }).catch(error => {
