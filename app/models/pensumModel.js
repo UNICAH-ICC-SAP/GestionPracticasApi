@@ -4,24 +4,21 @@ const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
     const attributes = {
-        docenteId: {
-            type: DataTypes.STRING(13),
+        id_clase: {
+            type: DataTypes.STRING(10),
             primaryKey: true
         },
-        email: {
-            type: DataTypes.STRING(50)
+        nombre_clase: {
+            type: DataTypes.STRING(100)
         },
-        nombre: {
-            type: DataTypes.STRING(50)
+        creditos: {
+            type: DataTypes.INTEGER(11)
         },
-        facultadId: {
-            type: DataTypes.STRING(5)
+        estado: {
+            type: DataTypes.BOOLEAN(1)
         },
-        telefono: {
-            type: DataTypes.STRING(15)
-        },
-        estadoDocente: {
-            type: DataTypes.BOOLEAN
+        es_lab: {
+            type: DataTypes.BOOLEAN(1)
         }
     }
     const options = {
@@ -32,9 +29,9 @@ module.exports = (sequelize) => {
         scopes: {
             //TODO: Includes attributes for scopes here
         },
-        tableName: 'docente',
+        tableName: 'clases',
         timestamps: 'false'
     }
 
-    return sequelize.define('docente', attributes, options);
+    return sequelize.define('clases', attributes, options);
 }

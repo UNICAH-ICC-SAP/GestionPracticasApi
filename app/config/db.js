@@ -40,6 +40,9 @@ db.detalleDocumentacion = require("../models/detalleDocumentacionModel")(sequeli
 db.documento = require("../models/documentoModel")(sequelizeInstance, Sequelize);
 db.terna = require("../models/ternaModel")(sequelizeInstance, Sequelize);
 db.detalleTerna = require("../models/detalleTernaModel")(sequelizeInstance, Sequelize);
+db.clases = require("../models/pensumModel")(sequelizeInstance, Sequelize);
+db.carrera_clase_bloque = require("../models/ccbModel")(sequelizeInstance, Sequelize);
+
 
 //alumno -< facultad
 db.alumno.belongsTo(db.facultad, { foreignKey: { name: 'facultadId', } });
@@ -57,5 +60,10 @@ db.facultad.hasMany(db.docente, { foreignKey: 'facultadId', sourceKey: 'facultad
 //
 db.docente.belongsTo(db.detalleTerna, { foreignKey: { name: 'docenteId' } });
 db.detalleTerna.hasOne(db.docente, { foreignKey: 'docenteId', sourceKey: 'docenteId' })
+
+//carrera_clase_bloque -< clases
+db.carrera_clase_bloque.belongsTo(db.clases, { foreignKey: 'id_clase', targetKey: 'id_clase' });
+db.clases.hasMany(db.carrera_clase_bloque, { foreignKey: 'id_clase' });
+
 
 module.exports = db;
