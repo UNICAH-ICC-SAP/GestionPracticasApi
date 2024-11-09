@@ -7,7 +7,6 @@ const { Op } = require('sequelize')
 
 module.exports = {
     get,
-    getPensumBy,
     insert,
     update,
     updateStatus,
