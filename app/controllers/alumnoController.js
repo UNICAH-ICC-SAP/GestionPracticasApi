@@ -17,7 +17,7 @@ async function insert(req, res) {
     Alumno.create({
         alumnoId: alumno.alumnoId,
         email: alumno.email,
-        nombre: alumno.nombreAlumno,
+        nombre: alumno.nombre,
         facultadId: alumno.facultadId,
         telefono: alumno.telefono
 
