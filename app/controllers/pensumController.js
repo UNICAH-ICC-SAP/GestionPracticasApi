@@ -3,7 +3,6 @@
 const db = require('../config/db')
 const Pensum = db.clases;
 const CarreraClaseBloque = db.carrera_clase_bloque;
-const { Op } = require('sequelize')
 
 module.exports = {
     get,
@@ -14,7 +13,7 @@ module.exports = {
 }
 
 async function get(req, res) {
-    Pensum.findAll() 
+    Pensum.findAll()
         .then(data => {
             res.status(200).send(data);
         })
@@ -33,7 +32,7 @@ async function getClassBy(req, res) {
             where: { id_carrera: id_carrera },
             include: [{
                 model: Pensum,
-                as: 'clase', 
+                as: 'clase',
                 attributes: ['id_clase', 'nombre_clase', 'creditos', 'estado', 'es_lab']
             }]
         });

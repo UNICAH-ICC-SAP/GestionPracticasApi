@@ -1,10 +1,10 @@
 'use strict'
 
-const config = require("../config/config");
 const Sequelize = require("sequelize");
 require('dotenv').config()
 const fs = require("fs");
 
+/*eslint-disable no-undef*/
 const sequelizeInstance = new Sequelize(process.env.DB, process.env.USER, process.env.PASSWORD, {
     host: process.env.HOST,
     dialect: process.env.DIALECT,
@@ -24,7 +24,7 @@ const sequelizeInstance = new Sequelize(process.env.DB, process.env.USER, proces
         idle: parseInt(process.env.POOL_IDLE)
     }
 });
-
+/*eslint-enable no-undef*/
 const db = {};
 
 db.Sequelize = Sequelize;

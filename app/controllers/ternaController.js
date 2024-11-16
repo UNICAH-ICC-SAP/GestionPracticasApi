@@ -4,7 +4,6 @@ const db = require('../config/db')
 const Terna = db.terna;
 const DetalleTerna = db.detalleTerna;
 const Alumno = db.alumno;
-const { Op, Model } = require('sequelize')
 const { isEmpty } = require('lodash')
 
 module.exports = {

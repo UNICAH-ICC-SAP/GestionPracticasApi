@@ -3,7 +3,6 @@
 const db = require('../config/db')
 const Docente = db.docente;
 const Facultad = db.facultad;
-const { Op } = require('sequelize')
 
 module.exports = {
     findAll,
@@ -39,18 +38,18 @@ async function findAll(req, res) {
         where: { estadoDocente: 1 },
         include: [{ model: Facultad }]
     })
-    .then(data => {
-        res.status(200).send(data);
-    })
-    .catch(err => {
-        res.status(500).send({
-            message: err.message || "Sucedió un error al obtener los registros de docentes."
+        .then(data => {
+            res.status(200).send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Sucedió un error al obtener los registros de docentes."
+            });
         });
-    });
 }
 
 async function findBy(req, res) {
-    Docente.findAll({ 
+    Docente.findAll({
         where: req.query,
         include: [{ model: Facultad }]
     })
@@ -72,7 +71,7 @@ async function findBy(req, res) {
 }
 
 async function update(req, res) {
-    const {docenteId} = req.query;
+    const { docenteId } = req.query;
     const updatedData = req.body;
 
     if (!docenteId) {

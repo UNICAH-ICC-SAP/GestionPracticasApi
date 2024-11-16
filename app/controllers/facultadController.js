@@ -2,7 +2,6 @@
 
 const db = require('../config/db')
 const Facultad = db.facultad;
-const { Op } = require('sequelize')
 
 module.exports = {
     findAll,

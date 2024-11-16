@@ -2,7 +2,6 @@
 
 const jwt = require('jwt-simple');
 const moment = require('moment');
-const config = require('../config/config');
 
 function createToken(user) {
     const payload = {
@@ -10,19 +9,24 @@ function createToken(user) {
         iat: moment().unix,
         exp: moment().add(15, 'days').unix()
     }
-    return jwt.encode(payload, config.SECRET_TOKEN);
+    /*eslint-disable no-undef*/
+    return jwt.encode(payload, process.env.SECRET_TOKEN);
+    /*eslint-enable no-undef*/
 }
 
 function decodeToken(token) {
     const decoded = new Promise(function (resolve, reject) {
         try {
-            const payload = jwt.decode(token, config.SECRET_TOKEN);
+            /*eslint-disable no-undef*/
+            const payload = jwt.decode(token, process.env.SECRET_TOKEN);
+            /*eslint-enable no-undef*/
             if (payload.exp <= moment().unix()) { reject({ status: 401, message: 'Token expired' }); }
             resolve(payload.sub);
         } catch (error) {
             reject({
                 status: 500,
-                message: 'Invalid token'
+                message: `Invalid token`,
+                errorMessage: error.message
             });
         }
     });
