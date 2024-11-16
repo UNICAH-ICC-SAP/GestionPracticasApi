@@ -1,7 +1,6 @@
 'use strict'
 
 const { DataTypes } = require('sequelize');
-const facultad = require('../models/facultadModel')
 
 module.exports = (sequelize) => {
     const attributes = {

@@ -2,8 +2,6 @@
 
 const db = require('../config/db')
 const DetalleDocumentacion = db.detalleDocumentacion;
-const Documento = db.documento
-const { Op } = require('sequelize')
 
 module.exports = {
     findAll,

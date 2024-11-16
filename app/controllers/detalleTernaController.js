@@ -3,7 +3,6 @@
 const db = require('../config/db')
 const DetalleTerna = db.detalleTerna;
 const Docente = db.docente;
-const { Op } = require('sequelize')
 
 module.exports = {
     findAll,

@@ -2,7 +2,6 @@
 
 const db = require('../config/db')
 const Role = db.role;
-const { Op } = require('sequelize')
 
 module.exports = {
     findAll,
