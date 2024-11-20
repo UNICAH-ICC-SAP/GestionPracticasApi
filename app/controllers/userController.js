@@ -55,7 +55,8 @@ async function signIn(req, res) {
                         message: 'Logged in',
                         userId: data['userId'],
                         roleId: data['roleId'],
-                        token: service.createToken(data['userId'])
+                        token: service.createToken(data['userId']),
+                        passwordResetRequired: data['passwordResetRequired']
                     });
                 } else {
                     res.status(500).send({
