@@ -9,7 +9,8 @@ const service = require('../services/services');
 module.exports = {
     signUp,
     signIn,
-    getUserInfo
+    getUserInfo,
+    resetPassword
 }
 
 async function signUp(req, res) {
@@ -54,7 +55,8 @@ async function signIn(req, res) {
                         message: 'Logged in',
                         userId: data['userId'],
                         roleId: data['roleId'],
-                        token: service.createToken(data['userId'])
+                        token: service.createToken(data['userId']),
+                        passwordResetRequired: data['passwordResetRequired']
                     });
                 } else {
                     res.status(500).send({
@@ -86,4 +88,45 @@ function getUserInfo(req, res) {
             if (err) return res.status(500).send({ message: err });
 
         })
+}
+
+async function resetPassword(req, res) {
+    const userId = req.query.userId;
+    const newPassword = req.body.newPassword;
+
+    if (!userId || !newPassword) {
+        return res.status(400).send({
+            message: "Se requiere el id del usuario y su nueva contraseña."
+        });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(newPassword, 10); //Hash para asegurar la contraseña
+
+        const [updated] = await User.update(
+            {
+                pass: hashedPassword,
+                passwordResetRequired: false // Se cambia el estado a 0, para que ya no pida el reseteo de contraseña
+            },
+            {
+                where: { userId }
+            }
+        );
+
+        if (updated) {
+            return res.status(200).send({
+                message: "Contraseña actualizada exitosamente"
+            });
+        } else {
+            return res.status(404).send({
+                message: "Usuario no encontrado"
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send({
+            message: "Error al actualizar la contraseña",
+            error: err.message
+        });
+    }
 }
