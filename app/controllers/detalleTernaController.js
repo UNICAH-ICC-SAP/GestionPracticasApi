@@ -13,23 +13,11 @@ module.exports = {
 async function insert(req, res) {
     try {
         const detalleTernas = req.body;
-        // Verificar que req.body sea un array
         if (!Array.isArray(detalleTernas)) {
             return res.status(400).send({
                 message: "Se esperaba un array de objetos para insertar múltiples registros."
             });
         }
-
-        // Verificar que cada objeto dentro del array contenga los campos requeridos
-        // for (const detalleTerna of detalleTernas) {
-        //     if (!detalleTerna.ternaId || !detalleTerna.docenteId || typeof detalleTerna.coordina !== 'boolean') {
-        //         return res.status(400).send({
-        //             message: "Cada objeto debe contener ternaId, docenteId y coordina (booleano)."
-        //         });
-        //     }
-        // }
-
-        // Insertar todos los registros en detalleTerna
         const data = await DetalleTerna.bulkCreate(detalleTernas);
 
         // Responder con los registros creados

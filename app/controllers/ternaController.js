@@ -19,7 +19,7 @@ async function insert(req, res) {
         idEstadoTerna: terna.idEstadoTerna,
     }).then(data => {
         console.log(data)
-        res.status(200).send({...data['dataValues'], ternaId: data['null']}); //devolver el terna id
+        res.status(200).send({...data['dataValues'], ternaId: data['null']}); 
     }).catch(error => {
         console.error(error)
         res.status(500).send({
