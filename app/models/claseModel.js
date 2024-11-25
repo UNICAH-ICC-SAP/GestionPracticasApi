@@ -12,19 +12,19 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING(100)
         },
         creditos: {
-            type: DataTypes.INTEGER(11)
+            type: DataTypes.INTEGER
         },
         estado: {
-            type: DataTypes.BOOLEAN(1)
+            type: DataTypes.BOOLEAN
         },
-        es_lab: {
-            type: DataTypes.BOOLEAN(1)
+        TipoClase: {
+            type: DataTypes.INTEGER
         }
     }
     const options = {
         defaultScope: {
             //TODO: Exclude attributes by default here
-            attributes: { exclude: ['createdAt', 'updatedAt'] }
+            attributes: { exclude: ['createdAt', 'updatedAt', 'updateAt'] }
         },
         scopes: {
             //TODO: Includes attributes for scopes here

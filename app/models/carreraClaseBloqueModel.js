@@ -4,14 +4,18 @@ const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
     const attributes = {
-        id_carrera: {
+        id_ccb: {
+            type: DataTypes.INTEGER,
+            primaryKey: true
+        },
+        facultadId: {
             type: DataTypes.STRING(10),
         },
         id_clase: {
-            type: DataTypes.STRING(100)
+            type: DataTypes.STRING(10)
         },
         id_bloque: {
-            type: DataTypes.INTEGER(11)
+            type: DataTypes.INTEGER
         },
         
     }
