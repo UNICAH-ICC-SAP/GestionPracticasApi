@@ -40,8 +40,8 @@ db.detalleDocumentacion = require("../models/detalleDocumentacionModel")(sequeli
 db.documento = require("../models/documentoModel")(sequelizeInstance, Sequelize);
 db.terna = require("../models/ternaModel")(sequelizeInstance, Sequelize);
 db.detalleTerna = require("../models/detalleTernaModel")(sequelizeInstance, Sequelize);
-db.clases = require("../models/pensumModel")(sequelizeInstance, Sequelize);
-db.carrera_clase_bloque = require("../models/ccbModel")(sequelizeInstance, Sequelize);
+db.clases = require("../models/claseModel")(sequelizeInstance, Sequelize);
+db.carrera_clase_bloque = require("../models/carreraClaseBloqueModel")(sequelizeInstance, Sequelize);
 
 
 //alumno -< facultad

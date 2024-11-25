@@ -4,6 +4,7 @@ const db = require('../config/db')
 const Pensum = db.clases;
 const CarreraClaseBloque = db.carrera_clase_bloque;
 
+
 module.exports = {
     get,
     insert,
@@ -13,40 +14,34 @@ module.exports = {
 }
 
 async function get(req, res) {
-    Pensum.findAll()
+    const tipoClase = req.query.TipoClase;
+    Pensum.findAll({
+        where: { TipoClase: tipoClase, estado: 1 }
+    })
         .then(data => {
             res.status(200).send(data);
         })
-        .catch(err => {
+        .catch(error => {
             res.status(500).send({
-                message: err.message || "Sucedió un error al obtener los registros de Pensum"
+                message: error.message || "Sucedió un error al obtener los registros de Pensum"
             });
         });
 }
 
 async function getClassBy(req, res) {
-    const { id_carrera } = req.query;
-
-    try {
-        const clases = await CarreraClaseBloque.findAll({
-            where: { id_carrera: id_carrera },
-            include: [{
-                model: Pensum,
-                as: 'clase',
-                attributes: ['id_clase', 'nombre_clase', 'creditos', 'estado', 'es_lab']
-            }]
-        });
-
-        res.status(200).send(clases);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send({
-            message: err.message || "Sucedió un error al obtener las clases por carrera"
-        });
-    }
+    const facultadId = req.query.facultadId;
+    CarreraClaseBloque.findAll({
+        where: { facultadId: facultadId }
+    })
+        .then(data => {
+            res.status(200).send(data);
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: error.message || "Sucedio un error al obtener los registros de Pensum"
+            })
+        })
 }
-
-
 
 async function insert(req, res) {
     const pensum = req.body;
@@ -54,11 +49,11 @@ async function insert(req, res) {
         id_clase: pensum.id_clase,
         nombre_clase: pensum.nombre_clase,
         creditos: pensum.creditos,
-        estado: pensum.estado,
-        es_lab: pensum.es_lab
+        estado: 1,
+        TipoClase: pensum.TipoClase
     }).then(data => {
         CarreraClaseBloque.create({
-            id_carrera: pensum.id_carrera,
+            facultadId: pensum.facultadId,
             id_clase: data.id_clase,
             id_bloque: pensum.id_bloque
         }).then(() => {
