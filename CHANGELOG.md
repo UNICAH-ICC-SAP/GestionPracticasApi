@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.3](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.1.2...v1.1.3) (2024-12-01)
+
+
+### Bug Fixes
+
+* Alumno controler incluir facultad y creacion de relacion de modelos ([#17](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/issues/17)) ([7057d89](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/7057d892b11ecb792dff615866b34808f47d4a89))
+
 ### [1.1.2](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.1.1...v1.1.2) (2024-11-26)
 
 
