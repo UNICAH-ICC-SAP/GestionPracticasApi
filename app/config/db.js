@@ -58,6 +58,10 @@ db.alumno.hasOne(db.terna, { foreignKey: 'alumnoId', sourceKey: 'alumnoId' });
 db.docente.belongsTo(db.facultad, { foreignKey: { name: 'facultadId' } });
 db.facultad.hasMany(db.docente, { foreignKey: 'facultadId', sourceKey: 'facultadId' });
 //
+//alumno -< facultad
+db.alumno.belongsTo(db.facultad, { foreignKey: { name: 'facultadId' } });
+db.facultad.hasMany(db.alumno, { foreignKey: 'facultadId', sourceKey: 'facultadId' });
+//
 db.docente.belongsTo(db.detalleTerna, { foreignKey: { name: 'docenteId' } });
 db.detalleTerna.hasOne(db.docente, { foreignKey: 'docenteId', sourceKey: 'docenteId' })
 

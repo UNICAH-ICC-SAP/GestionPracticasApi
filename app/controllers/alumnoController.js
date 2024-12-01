@@ -3,6 +3,7 @@
 const db = require('../config/db');
 const facultad = db.facultad;
 const Alumno = db.alumno;
+const Facultad = db.facultad;
 
 module.exports = {
     findAll,
@@ -32,7 +33,9 @@ async function insert(req, res) {
 }
 
 async function findAll(req, res) {
-    Alumno.findAll()
+    Alumno.findAll({
+        include: [{ model: Facultad }]
+    })
         .then(data => {
             res.status(200).send(data);
         })
