@@ -44,7 +44,6 @@ db.detalleTerna = require("../models/detalleTernaModel")(sequelizeInstance, Sequ
 db.clases = require("../models/claseModel")(sequelizeInstance, Sequelize);
 db.carrera_clase_bloque = require("../models/carreraClaseBloqueModel")(sequelizeInstance, Sequelize);
 db.periodos = require("../models/periodoModel")(sequelizeInstance, Sequelize);
-db.secciones = require("../models/seccionesModel")(sequelizeInstance, Sequelize);
 db.detalle_periodo = require("../models/seccionesModel")(sequelizeInstance, Sequelize);
 
 // Relaciones
@@ -78,14 +77,14 @@ db.facultad.hasMany(db.carrera_clase_bloque, { foreignKey: 'facultadId', sourceK
 
 // DetallePeriodo -< CarreraClaseBloque
 db.detalle_periodo.belongsTo(db.carrera_clase_bloque, {
-    foreignKey: 'id_ccb',  // El campo en detalle_periodo que hace referencia a carrera_clase_bloque
-    targetKey: 'id_ccb',   // La clave primaria de carrera_clase_bloque
-    as: 'ccb'              // Alias para referirse a carrera_clase_bloque
+    foreignKey: 'id_ccb',
+    targetKey: 'id_ccb',
+    as: 'ccb'
 });
 db.carrera_clase_bloque.hasMany(db.detalle_periodo, {
-    foreignKey: 'id_ccb',  // El campo en carrera_clase_bloque que hace referencia a detalle_periodo
-    sourceKey: 'id_ccb',   // La clave primaria de detalle_periodo
-    as: 'detallePeriodos'  // Alias para referirse a detalle_periodo desde carrera_clase_bloque
+    foreignKey: 'id_ccb',
+    sourceKey: 'id_ccb',
+    as: 'detallePeriodos'
 });
 
 // Periodos -< DetallePeriodo
