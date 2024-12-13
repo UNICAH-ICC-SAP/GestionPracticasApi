@@ -21,6 +21,8 @@ const ternaRoutes = require('./routes/ternaRoutes');
 const detalleTernaRoutes = require('./routes/detalleTernaRoutes');
 const pensumRoutes = require('./routes/pensumRoutes');
 const periodosRoutes = require('./routes/periodoRoutes');
+const seccionesRoutes = require('./routes/seccionesRoutes');
+
 //TODO: Put every route file here. App.use('api/test', test);
 App.use('/api/role', roleRoutes);
 App.use('/api/user', usuarioRoutes);
@@ -34,4 +36,6 @@ App.use('/api/ternas', ternaRoutes);
 App.use('/api/detalleTernas', detalleTernaRoutes);
 App.use('/api/pensum', pensumRoutes);
 App.use('/api/periodo', periodosRoutes);
+App.use('/api/secciones', seccionesRoutes);
+
 module.exports = App;
