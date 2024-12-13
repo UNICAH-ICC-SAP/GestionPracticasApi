@@ -164,7 +164,7 @@ async function enviarCorreo(req, res) {
         }
 
         const cuerpoPersonalizado = plantillaCorreo.cuerpo
-            .replace('{{userId}}', userId)
+            .replace('{{userId}}', he.encode(userId))
             /*eslint-disable no-undef*/
             .replace('{{pass}}', process.env.EMAIL_PASSWORD) 
             /*eslint-disable no-undef*/
@@ -182,10 +182,10 @@ async function enviarCorreo(req, res) {
         });
 
         const mailOptions = {
-            from: plantillaCorreo.correo_origen, 
-            to: correoDestino,                   
-            subject: plantillaCorreo.asunto,     
-            html: cuerpoPersonalizado             
+            from: he.encode(plantillaCorreo.correo_origen), 
+            to: he.encode(correoDestino),                   
+            subject: he.encode(plantillaCorreo.asunto),     
+            html: he.encode(cuerpoPersonalizado)            
         };
 
         const resultado = await transporter.sendMail(mailOptions);
