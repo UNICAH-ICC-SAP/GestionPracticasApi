@@ -15,55 +15,18 @@ module.exports = {
 };
 
 async function get(req, res) {
-    try {
-        const { id_periodo } = req.query;
-
-        // Validar que se proporcione el id_periodo
-        if (!id_periodo) {
-            return res.status(400).json({
-                message: "El id_periodo es requerido"
+    const id_periodo = req.query.id_periodo;
+    DetallePeriodo.findAll({
+        where: { id_periodo: id_periodo}
+    })
+        .then(data => {
+            res.status(200).send(data);
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: error.message || "Sucedió un error al obtener los registros de DetallePeriodos"
             });
-        }
-
-        // Buscar todos los detalles del periodo
-        const detallesPeriodo = await DetallePeriodo.findAll({
-            attributes: [
-                'id_periodo',
-                'id_ccb',
-                'docenteId',
-                'hora_inicio',
-                'hora_final',
-                'dia_inicio',
-                'dia_final',
-                'seccion'
-            ],
-            where: {
-                id_periodo: id_periodo
-            },
-            order: [
-                ['hora_inicio', 'ASC'],
-                ['seccion', 'ASC']
-            ]
-        });
-
-        if (!detallesPeriodo || detallesPeriodo.length === 0) {
-            return res.status(404).json({
-                message: "No se encontraron detalles para el periodo especificado"
-            });
-        }
-
-        return res.status(200).json({
-            message: "Detalles del periodo recuperados exitosamente",
-            detalles: detallesPeriodo
-        });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            message: "Error al recuperar los detalles del periodo",
-            error
-        });
-    }
+        });
 }
 
 async function insert(req, res) {
