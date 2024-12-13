@@ -21,7 +21,8 @@ async function insert(req, res) {
         email: alumno.email,
         nombre: alumno.nombre,
         facultadId: alumno.facultadId,
-        telefono: alumno.telefono
+        telefono: alumno.telefono,
+        estadoAlumno: 1
 
     }).then(data => {
         res.status(200).send(data);
@@ -36,6 +37,7 @@ async function insert(req, res) {
 
 async function findAll(req, res) {
     Alumno.findAll({
+        where: { estadoAlumno: 1 },
         include: [{ model: Facultad }]
     })
         .then(data => {
