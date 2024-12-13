@@ -3,6 +3,8 @@
 const db = require('../config/db');
 const Plantilla_Correo = db.plantilla_correo;
 const nodemailer = require('nodemailer'); // Importar Nodemailer
+const he = require('he');
+require('dotenv').config();
 
 module.exports = {
     findAll,
@@ -32,14 +34,9 @@ async function findAll(req, res) {
 // API para obtener una plantilla por su ID
 async function findBy(req, res) {
     try {
-        const { correoId } = req.params; // Extraer el correoId de los parámetros
-
-        // Verifica si el correoId es un número válido
-        const id = parseInt(correoId, 10);
+        const id = parseInt(req.params.correoId, 10);
         if (isNaN(id)) {
-            return res.status(400).json({
-                message: 'El ID proporcionado no es válido.'
-            });
+            return res.status(400).json({ message: 'El ID proporcionado no es válido.' });
         }
 
         const template = await Plantilla_Correo.findByPk(id, {
@@ -47,20 +44,14 @@ async function findBy(req, res) {
         });
 
         if (!template) {
-            return res.status(404).json({ 
-                message: 'Plantilla no encontrada' 
-            });
+            return res.status(404).json({ message: 'Plantilla no encontrada' });
         }
 
-        res.json(template); // Devolver la plantilla encontrada
+        res.json(template);
     } catch (error) {
-        res.status(500).json({ 
-            message: 'Error al obtener detalles de la plantilla', 
-            error: error.message 
-        });
+        res.status(500).json({ message: 'Error al obtener detalles de la plantilla', error: error.message });
     }
 }
-
 
 // API para crear una nueva plantilla de correo
 async function insert(req, res) {
@@ -154,12 +145,18 @@ async function updateStatus(req, res) {
 // API para enviar el correo con la plantilla
 async function enviarCorreo(req, res) {
     const { correoId } = req.params;  
-    const { correoDestino, userId, nombreUsuario } = req.body; 
+    const { correoDestino, userId, nombreUsuario } = req.body;
+
+    if (!correoId || !correoDestino || !userId || !nombreUsuario) {
+        return res.status(400).json({ 
+            message: 'Faltan datos requeridos',
+            detalles: { correoDestino, userId, nombreUsuario }
+        });
+    }
 
     try {
-        // Obtener la plantilla activa desde la base de datos
         const plantillaCorreo = await Plantilla_Correo.findOne({
-            where: { Id_correo: correoId, estado: 1 }
+            where: { Id_correo: parseInt(correoId, 10), estado: 1 }
         });
 
         if (!plantillaCorreo) {
@@ -167,20 +164,23 @@ async function enviarCorreo(req, res) {
         }
 
         const cuerpoPersonalizado = plantillaCorreo.cuerpo
-            .replace('{{userId}}', userId)               
-            .replace('{{pass}}', 'Unicah2024')           
-            .replace('{{nombreUsuario}}', nombreUsuario); 
+            .replace('{{userId}}', userId)
+            /*eslint-disable no-undef*/
+            .replace('{{pass}}', process.env.EMAIL_PASSWORD) 
+            /*eslint-disable no-undef*/
+            .replace('{{nombreUsuario}}', he.encode(nombreUsuario));
 
-        // Crear transporte de correo con Nodemailer
         const transporter = nodemailer.createTransport({
             service: 'gmail', 
             auth: {
                 user: plantillaCorreo.correo_origen,  
-                pass: plantillaCorreo.correo_password 
+                pass: process.env.EMAIL_PASSWORD 
+            },
+            tls: {
+                rejectUnauthorized: true 
             }
         });
 
-        // Configurar las opciones del correo
         const mailOptions = {
             from: plantillaCorreo.correo_origen, 
             to: correoDestino,                   
@@ -188,18 +188,9 @@ async function enviarCorreo(req, res) {
             html: cuerpoPersonalizado             
         };
 
-        // Enviar el correo
-        await transporter.sendMail(mailOptions);
-
-        // Responder al cliente si el correo fue enviado correctamente
-        res.status(200).json({
-            message: 'Correo enviado exitosamente',
-        });
+        const resultado = await transporter.sendMail(mailOptions);
+        res.status(200).json({ message: 'Correo enviado exitosamente', detalles: resultado });
     } catch (error) {
-        // Manejo de errores
-        res.status(500).json({
-            message: 'Error al enviar correo',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Error al enviar correo', error: error.message });
     }
 }
