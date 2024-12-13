@@ -26,13 +26,13 @@ async function insert(req, res) {
 }
 
 async function get(req, res) {
-    Periodo.findAll() 
+    Periodo.findAll()
         .then(data => {
             res.status(200).send(data);
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || "Sucedió un error al obtener los registros de Pensum"
+                message: err.message || "Sucedió un error al obtener los registros de Periodo"
             });
         });
 }
