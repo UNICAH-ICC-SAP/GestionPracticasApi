@@ -20,8 +20,12 @@ const documentoRoutes = require('./routes/docenteRoutes');
 const ternaRoutes = require('./routes/ternaRoutes');
 const detalleTernaRoutes = require('./routes/detalleTernaRoutes');
 const pensumRoutes = require('./routes/pensumRoutes');
+<<<<<<< Updated upstream
 const periodosRoutes = require('./routes/periodoRoutes');
 const seccionesRoutes = require('./routes/seccionesRoutes');
+=======
+const correo = require('./routes/enviarCorreoRoutes');
+>>>>>>> Stashed changes
 
 //TODO: Put every route file here. App.use('api/test', test);
 App.use('/api/role', roleRoutes);
@@ -35,7 +39,11 @@ App.use('/api/documentos', documentoRoutes);
 App.use('/api/ternas', ternaRoutes);
 App.use('/api/detalleTernas', detalleTernaRoutes);
 App.use('/api/pensum', pensumRoutes);
+<<<<<<< Updated upstream
 App.use('/api/periodo', periodosRoutes);
 App.use('/api/secciones', seccionesRoutes);
+=======
+App.use('/api/correo', correo);
+>>>>>>> Stashed changes
 
 module.exports = App;
