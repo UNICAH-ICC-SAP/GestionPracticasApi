@@ -12,10 +12,8 @@ async function insert(req, res) {
     const periodo = req.body;
 
     const fechaInicio = new Date(periodo.fecha_inicio); 
-    console.log('Fecha de inicio:', fechaInicio);
 
     const anioInicio = fechaInicio.getUTCFullYear();
-    console.log('Año de inicio:', anioInicio);
 
     const id_periodo = `${periodo.id_periodo}-${anioInicio}`;
 
