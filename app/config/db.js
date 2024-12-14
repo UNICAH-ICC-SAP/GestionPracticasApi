@@ -92,4 +92,9 @@ db.carrera_clase_bloque.hasMany(db.detalle_periodo, {
 db.detalle_periodo.belongsTo(db.periodos, { foreignKey: { name: 'id_periodo' } });
 db.periodos.hasMany(db.detalle_periodo, { foreignKey: 'id_periodo', sourceKey: 'id_periodo' });
 
+
+db.detalle_periodo.belongsTo(db.carrera_clase_bloque, { 
+    foreignKey: 'id_ccb', 
+    as: 'clase' 
+});
 module.exports = db;
