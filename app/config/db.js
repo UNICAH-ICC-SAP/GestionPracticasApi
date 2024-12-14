@@ -49,6 +49,23 @@ db.detalle_periodo = require("../models/seccionesModel")(sequelizeInstance, Sequ
 
 // Relaciones
 // Alumno -< Facultad
+db.plantilla_correo = require("../models/enviarCorreoModel")(sequelizeInstance, Sequelize);
+
+//alumno -< facultad
+db.alumno.belongsTo(db.facultad, { foreignKey: { name: 'facultadId', } });
+db.facultad.hasMany(db.alumno, { foreignKey: 'facultadId', sourceKey: 'facultadId' });
+
+//ternas -< detalle
+db.detalleTerna.belongsTo(db.terna, { foreignKey: { name: 'ternaId' } });
+db.terna.hasMany(db.detalleTerna, { foreignKey: 'ternaId', sourceKey: 'ternaId' });
+//ternas - alumno
+db.terna.belongsTo(db.alumno, { foreignKey: { name: 'alumnoId' } });
+db.alumno.hasOne(db.terna, { foreignKey: 'alumnoId', sourceKey: 'alumnoId' });
+//docente -< facultad
+db.docente.belongsTo(db.facultad, { foreignKey: { name: 'facultadId' } });
+db.facultad.hasMany(db.docente, { foreignKey: 'facultadId', sourceKey: 'facultadId' });
+//
+//alumno -< facultad
 db.alumno.belongsTo(db.facultad, { foreignKey: { name: 'facultadId' } });
 db.facultad.hasMany(db.alumno, { foreignKey: 'facultadId', sourceKey: 'facultadId' });
 
