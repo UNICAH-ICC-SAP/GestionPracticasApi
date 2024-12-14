@@ -164,9 +164,11 @@ async function enviarCorreo(req, res) {
         }
 
         const cuerpoPersonalizado = plantillaCorreo.cuerpo
-            .replace('{{userId}}', he.encode(userId))
-            .replace('{{pass}}', process.env.EMAIL_PASSWORD) 
-            .replace('{{nombreUsuario}}', he.encode(nombreUsuario));
+        .replace('{{userId}}', he.encode(userId))
+        /* eslint-disable no-undef */
+        .replace('{{pass}}', process.env.EMAIL_PASSWORD)
+        /* eslint-enable no-undef */
+        .replace('{{nombreUsuario}}', he.encode(nombreUsuario));
 
         const transporter = nodemailer.createTransport({
             service: 'gmail', 
