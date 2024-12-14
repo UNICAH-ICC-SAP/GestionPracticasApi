@@ -28,9 +28,11 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "he": "^1.2.0",
     "jwt-simple": "^0.5.6",
     "lodash": "^4.17.21",
     "mysql2": "^3.11.3",
+    "nodemailer": "^6.9.16",
     "sequelize": "^6.37.5"
   },
   "devDependencies": {
