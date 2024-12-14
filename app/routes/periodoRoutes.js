@@ -8,4 +8,4 @@ const apiRoutes = express.Router();
 apiRoutes.post('/insert', auth.isAuth, async (req, res) => await periodoController.insert(req, res))
         .get('/get', auth.isAuth, async (req, res) => await periodoController.get(req, res));
 
- module.exports = apiRoutes;
+module.exports = apiRoutes;
