@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.2.0...v1.3.0) (2024-12-14)
+
+
+### Features
+
+* eliminando package-lock.json y actualizando archivos ([#34](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/issues/34)) ([ed77d02](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/ed77d02c583a2ae4fc65832e08183ae9a03bccdc))
+
+
+### Bug Fixes
+
+* se modificó el endpoint de get para ver las secciones ([#30](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/issues/30)) ([5fd3d37](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/5fd3d37da9acf33ab61d2b44fc864f6d396c7ac8))
+* Se realizaron cambios en el en la función insert, se automatizo la creacion de id's ([#33](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/issues/33)) ([9d18097](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/9d180976f1c23d9f77d873d8442312f11c68ba71))
+
 ## [1.2.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.1.4...v1.2.0) (2024-12-13)
 
 
