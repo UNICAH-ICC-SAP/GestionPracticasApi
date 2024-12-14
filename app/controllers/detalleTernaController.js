@@ -3,6 +3,7 @@
 const db = require('../config/db');
 const DetalleTerna = db.detalleTerna;
 const Docente = db.docente;
+const Terna = db.terna;
 
 module.exports = {
     findAll,
@@ -33,7 +34,7 @@ async function insert(req, res) {
 async function findAll(req, res) {
     try {
         const data = await DetalleTerna.findAll({
-            include: [{ model: Docente }]
+            include: [{ model: Docente }, {model: Terna}]
         });
         res.status(200).send(data);
     } catch (error) {

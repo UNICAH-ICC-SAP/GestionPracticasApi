@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.1.4...v1.2.0) (2024-12-13)
+
+
+### Features
+
+* Creación de controlador y ruta de periodo ([#24](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/issues/24)) ([a0a8fd0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/a0a8fd09744b3acab15c528f00d49ca799282d11))
+* se agregó el controller para insertar, actualizar y eliminar secciones ([#25](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/issues/25)) ([7443570](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/74435706dc1aa9faa2de2c5f9ec9ae47297cec2e))
+
+
+### Bug Fixes
+
+* Actualizacion del controlador del alumno, creacion de estado Alumno en el alumnoModel y actualizacion en el controlador detalleTerna ([#22](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/issues/22)) ([938fe59](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/938fe5903d519f5b9f535b29c233d3e0bdc6f97d))
+
 ### [1.1.4](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.1.3...v1.1.4) (2024-12-12)
 
 ### [1.1.3](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.1.2...v1.1.3) (2024-12-01)
