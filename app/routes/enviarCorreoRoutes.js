@@ -10,17 +10,18 @@ correoRoutes.get('/obtenerPlantillas', auth.isAuth, async (req, res) => await co
     .post('/crearPlantilla', auth.isAuth, async (req, res) => await correoController.insert(req, res))
     .put('/actualizarPlantilla/:correoId', auth.isAuth, async (req, res) => await correoController.update(req, res))
     .put('/cambiarEstadoPlantilla/:correoId', auth.isAuth, async (req, res) => await correoController.updateStatus(req, res))
-    .post('/enviarCorreo', auth.isAuth, async (req, res) => {
-        const { correoId, userId, pass, nombreUsuario, correoDestinatario } = req.body; 
-
+    .post('/enviarCorreo/:correoId', auth.isAuth, async (req, res) => {
+        const { correoId } = req.params;  // El correoId viene desde los parámetros de la ruta
+        const { correoDestino, userId, nombreUsuario } = req.body; // Los demás datos vienen en el body
+    
         // Validar que todos los parámetros necesarios están presentes
-        if (!correoId || !userId || !pass || !nombreUsuario || !correoDestinatario) {
+        if (!correoId || !correoDestino || !userId || !nombreUsuario) {
             return res.status(400).json({ message: 'Faltan parámetros en el cuerpo de la solicitud.' });
         }
-
-        req.params = { correoId, userId, pass, nombreUsuario, correoDestinatario }; 
-
-        await correoController.enviarCorreo(req, res, userId, pass, nombreUsuario, correoDestinatario);
+    
+        req.params = { correoId, userId, nombreUsuario, correoDestino };
+    
+        await correoController.enviarCorreo(req, res, userId, nombreUsuario, correoDestino);
     });
 
 module.exports = correoRoutes;

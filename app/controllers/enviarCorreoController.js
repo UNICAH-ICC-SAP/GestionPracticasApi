@@ -165,16 +165,14 @@ async function enviarCorreo(req, res) {
 
         const cuerpoPersonalizado = plantillaCorreo.cuerpo
             .replace('{{userId}}', he.encode(userId))
-            /*eslint-disable no-undef*/
             .replace('{{pass}}', process.env.EMAIL_PASSWORD) 
-            /*eslint-disable no-undef*/
             .replace('{{nombreUsuario}}', he.encode(nombreUsuario));
 
         const transporter = nodemailer.createTransport({
             service: 'gmail', 
             auth: {
                 user: plantillaCorreo.correo_origen,  
-                pass: process.env.EMAIL_PASSWORD 
+                pass: plantillaCorreo.correo_password
             },
             tls: {
                 rejectUnauthorized: true 
