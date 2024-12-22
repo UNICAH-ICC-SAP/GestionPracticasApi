@@ -1,6 +1,7 @@
 'use strict';
 
 const db = require('../config/db');
+const Sequelize = require('sequelize');
 const DetallePeriodo = db.detalle_periodo;
 
 module.exports = {
@@ -16,33 +17,46 @@ async function findAll(req, res) {
         });
     }
 
-    DetallePeriodo.findAll({
-        attributes: [
-            'seccion',
-            [db.Sequelize.fn('MAX', db.Sequelize.col('id_detalle')), 'id_detalle'],
-            [db.Sequelize.fn('MAX', db.Sequelize.col('docenteId')), 'docenteId'],
-            [db.Sequelize.fn('MAX', db.Sequelize.col('hora_inicio')), 'hora_inicio'],
-            [db.Sequelize.fn('MAX', db.Sequelize.col('hora_final')), 'hora_final'],
-            [db.Sequelize.fn('MAX', db.Sequelize.col('dia_inicio')), 'dia_inicio'],
-            [db.Sequelize.fn('MAX', db.Sequelize.col('dia_final')), 'dia_final']
-        ],
-        where: {
-            id_periodo: id_periodo,
-            docenteId: docenteId
-        },
-        group: ['seccion']
-    })
-    .then(clase => {
-        if (clase.length === 0) {
-            return res.status(404).send({
-                message: `No se encontraron clases en el periodo ${id_periodo} con el docente ${docenteId}.`
-            });
-        }
-        res.status(200).send(clase);
-    })
-    .catch(err => {
-        res.status(500).send({
-            message: err.message || "Error al obtener las clases."
+    try {
+        const resultados = await DetallePeriodo.findAll({
+            where: {
+                id_periodo: id_periodo,
+                docenteId: docenteId
+            },
+            attributes: [
+                'seccion',
+                'docenteId',
+                'id_periodo',
+                'hora_inicio',
+                'dia_inicio', 
+                'dia_final',
+                'hora_final',
+                [Sequelize.literal('`clase`.`id_clase`'), 'id_clase']
+            ],
+            include: [
+                {
+                    model: db.carrera_clase_bloque,
+                    as: 'clase',
+                    attributes: [] 
+                }
+            ],
+            group: [
+                'seccion', 
+                'docenteId', 
+                'id_periodo', 
+                'hora_inicio', 
+                'dia_inicio', 
+                'dia_final', 
+                'hora_final', 
+                'clase.id_clase'
+            ]
         });
-    });
+
+        res.status(200).send(resultados);
+    } catch (err) {
+        res.status(500).send({
+            message: err.message || "Error al obtener las clases con las relaciones."
+        });
+    }
 }
+
