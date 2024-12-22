@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.3.0...v1.4.0) (2024-12-22)
+
+
+### Features
+
+* se realizo una funcion para obtener las clases por docente ([#35](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/issues/35)) ([304cf62](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/304cf6235a52a153d5ac10f18f3644b5713f52e3))
+
+
+### Bug Fixes
+
+* double white space ([5dd80df](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/5dd80df61d9d791ba81adea5946b26bf7f62a54e))
+
 ## [1.3.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.2.0...v1.3.0) (2024-12-14)
 
 
