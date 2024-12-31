@@ -19,14 +19,14 @@ module.exports = {
 async function findAll(req, res) {
     try {
         const templates = await Plantilla_Correo.findAll({
-            attributes: ['Id_correo', 'asunto'], 
-            where: { estado: true } 
+            attributes: ['Id_correo', 'asunto'],
+            where: { estado: true }
         });
-        res.json(templates);
+        res.status(200).json(templates);
     } catch (error) {
-        res.status(500).json({ 
-            message: 'Error al obtener plantillas', 
-            error: error.message 
+        res.status(500).json({
+            message: 'Error al obtener plantillas',
+            error: error.message
         });
     }
 }
@@ -55,7 +55,7 @@ async function findBy(req, res) {
 
 // API para crear una nueva plantilla de correo
 async function insert(req, res) {
-const { correo_origen, correo_password, asunto, cuerpo } = req.body;
+    const { correo_origen, correo_password, asunto, cuerpo } = req.body;
 
     try {
         const nuevaPlantilla = await Plantilla_Correo.create({
@@ -71,9 +71,9 @@ const { correo_origen, correo_password, asunto, cuerpo } = req.body;
             templateId: nuevaPlantilla.Id_correo // Retorna el ID de la nueva plantilla creada
         });
     } catch (error) {
-        res.status(500).json({ 
-            message: 'Error al crear plantilla', 
-            error: error.message 
+        res.status(500).json({
+            message: 'Error al crear plantilla',
+            error: error.message
         });
     }
 }
@@ -98,7 +98,7 @@ async function update(req, res) {
 
         if (updated) {
             const updated = await Plantilla_Correo.findByPk(correoId, {
-                attributes: ['Id_correo', 'correo_origen', 'correo_password','asunto', 'cuerpo']
+                attributes: ['Id_correo', 'correo_origen', 'correo_password', 'asunto', 'cuerpo']
             });
             res.json({
                 message: 'Plantilla actualizada exitosamente',
@@ -108,9 +108,9 @@ async function update(req, res) {
             res.status(404).json({ message: 'Plantilla no encontrada' });
         }
     } catch (error) {
-        res.status(500).json({ 
-            message: 'Error al actualizar la plantilla', 
-            error: error.message 
+        res.status(500).json({
+            message: 'Error al actualizar la plantilla',
+            error: error.message
         });
     }
 }
@@ -133,7 +133,7 @@ async function updateStatus(req, res) {
         });
 
         if (plantilla[0] === 1) {
-            res.status(200).send({ message: 'Plantilla desactivada correctamente.'});
+            res.status(200).send({ message: 'Plantilla desactivada correctamente.' });
         } else {
             res.status(404).send({ message: 'Plantilla no encontrada.' });
         }
@@ -144,11 +144,11 @@ async function updateStatus(req, res) {
 
 // API para enviar el correo con la plantilla
 async function enviarCorreo(req, res) {
-    const { correoId } = req.params;  
+    const { correoId } = req.params;
     const { correoDestino, userId, nombreUsuario } = req.body;
 
     if (!correoId || !correoDestino || !userId || !nombreUsuario) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: 'Faltan datos requeridos',
             detalles: { correoDestino, userId, nombreUsuario }
         });
@@ -164,28 +164,28 @@ async function enviarCorreo(req, res) {
         }
 
         const cuerpoPersonalizado = plantillaCorreo.cuerpo
-        .replace('{{userId}}', he.encode(userId))
-        /* eslint-disable no-undef */
-        .replace('{{pass}}', process.env.EMAIL_PASSWORD)
-        /* eslint-enable no-undef */
-        .replace('{{nombreUsuario}}', he.encode(nombreUsuario));
+            .replace('{{userId}}', he.encode(userId))
+            /* eslint-disable no-undef */
+            .replace('{{pass}}', process.env.EMAIL_PASSWORD)
+            /* eslint-enable no-undef */
+            .replace('{{nombreUsuario}}', he.encode(nombreUsuario));
 
         const transporter = nodemailer.createTransport({
-            service: 'gmail', 
+            service: 'gmail',
             auth: {
-                user: plantillaCorreo.correo_origen,  
+                user: plantillaCorreo.correo_origen,
                 pass: plantillaCorreo.correo_password
             },
             tls: {
-                rejectUnauthorized: true 
+                rejectUnauthorized: true
             }
         });
 
         const mailOptions = {
-            from: he.encode(plantillaCorreo.correo_origen), 
-            to: he.encode(correoDestino),                   
-            subject: he.encode(plantillaCorreo.asunto),     
-            html: he.encode(cuerpoPersonalizado)            
+            from: he.encode(plantillaCorreo.correo_origen),
+            to: he.encode(correoDestino),
+            subject: he.encode(plantillaCorreo.asunto),
+            html: he.encode(cuerpoPersonalizado)
         };
 
         const resultado = await transporter.sendMail(mailOptions);
