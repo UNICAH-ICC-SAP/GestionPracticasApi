@@ -479,7 +479,8 @@ async function update(req, res) {
 
 async function deleteSection(req, res) {
     try {
-        const { id_clase, seccion } = req.body;
+        console.log(req.query)
+        const { id_clase, seccion } = req.query;
 
         // Validar parámetros requeridos
         if (!id_clase || !seccion) {
