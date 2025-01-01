@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Api para Gestion de Clases",
   "main": "index.js",
   "scripts": {
