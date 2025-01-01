@@ -10,7 +10,7 @@
     "release": "standard-version && git push -f --follow-tags --no-verify",
     "prepare": "husky",
     "pre-commit": "npm run lint -fix",
-    "build": "rimraf dist && mkdir dist && cpy index.js dist && cpy app/**/* dist/app --parents && cpy package.json dist"
+    "build": "rimraf dist && mkdir dist && cpy index.js dist && cpy app/**/* dist/app --parents && cpy package.json dist && cpy ca.pem dist"
   },
   "keywords": [
     "Gestion",
