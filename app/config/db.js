@@ -8,7 +8,7 @@ const fs = require("fs");
 const sequelizeInstance = new Sequelize(process.env.DB, process.env.USER, process.env.PASSWORD, {
     host: process.env.HOST,
     dialect: process.env.DIALECT,
-    port: process.env.PORT,
+    port: process.env.MY_SQL_PORT,
     dialectOptions: {
         connectTimeout: 100000
     },
@@ -110,8 +110,8 @@ db.detalle_periodo.belongsTo(db.periodos, { foreignKey: { name: 'id_periodo' } }
 db.periodos.hasMany(db.detalle_periodo, { foreignKey: 'id_periodo', sourceKey: 'id_periodo' });
 
 
-db.detalle_periodo.belongsTo(db.carrera_clase_bloque, { 
-    foreignKey: 'id_ccb', 
-    as: 'clase' 
+db.detalle_periodo.belongsTo(db.carrera_clase_bloque, {
+    foreignKey: 'id_ccb',
+    as: 'clase'
 });
 module.exports = db;
