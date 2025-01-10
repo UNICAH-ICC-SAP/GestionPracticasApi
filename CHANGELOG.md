@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.8](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.7...v1.4.8) (2025-01-10)
+
+
+### Bug Fixes
+
+* vulnerabilidad archivo .env ([ff0359f](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/ff0359ffc55825463ca5cd02cf442daffa19ec1c))
+
 ### [1.4.7](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.6...v1.4.7) (2025-01-10)
 
 
