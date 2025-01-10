@@ -19,7 +19,7 @@ module.exports = {
 async function findAll(req, res) {
     try {
         const templates = await Plantilla_Correo.findAll({
-            attributes: ['Id_correo', 'asunto'],
+            attributes: ['Id_correo', 'correo_origen', 'correo_password', 'asunto', 'cuerpo', 'estado'],
             where: { estado: true }
         });
         res.status(200).json(templates);
@@ -144,6 +144,7 @@ async function updateStatus(req, res) {
 
 // API para enviar el correo con la plantilla
 async function enviarCorreo(req, res) {
+    const entries = (Object.entries(req.body));
     const { correoId } = req.params;
     const { correoDestino, userId, nombreUsuario } = req.body;
 
@@ -162,34 +163,39 @@ async function enviarCorreo(req, res) {
         if (!plantillaCorreo) {
             return res.status(404).json({ message: 'Plantilla no encontrada o inactiva.' });
         }
-
-        const cuerpoPersonalizado = plantillaCorreo.cuerpo
-            .replace('{{userId}}', he.encode(userId))
-            /* eslint-disable no-undef */
-            .replace('{{pass}}', process.env.EMAIL_PASSWORD)
-            /* eslint-enable no-undef */
-            .replace('{{nombreUsuario}}', he.encode(nombreUsuario));
+        let cuerpoPersonalizado = plantillaCorreo.cuerpo;
+        entries.forEach(item => {
+            cuerpoPersonalizado = cuerpoPersonalizado
+                .replace(`{{${item[0]}}}`, he.encode(item[1]))
+            console.log(item[0])
+        });
+        /* eslint-disable no-undef */
+        cuerpoPersonalizado = cuerpoPersonalizado.replace('{{pass}}', process.env.EMAIL_PASSWORD)
+        /* eslint-enable no-undef */
+        console.log(cuerpoPersonalizado)
 
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false, // upgrade later with STARTTLS
             auth: {
                 user: plantillaCorreo.correo_origen,
-                pass: plantillaCorreo.correo_password
+                pass: plantillaCorreo.correo_password,
             },
-            tls: {
-                rejectUnauthorized: true
-            }
         });
 
         const mailOptions = {
-            from: he.encode(plantillaCorreo.correo_origen),
+            from: `Unidad Acádemica SAP ${he.encode(plantillaCorreo.correo_origen)}`,
             to: he.encode(correoDestino),
             subject: he.encode(plantillaCorreo.asunto),
-            html: he.encode(cuerpoPersonalizado)
+            html: cuerpoPersonalizado
         };
 
-        const resultado = await transporter.sendMail(mailOptions);
-        res.status(200).json({ message: 'Correo enviado exitosamente', detalles: resultado });
+        await transporter.sendMail(mailOptions).then(result => {
+            res.status(200).json({ message: 'Correo enviado exitosamente', detalles: result });
+            transporter.close();
+        });
+
     } catch (error) {
         res.status(500).json({ message: 'Error al enviar correo', error: error.message });
     }
