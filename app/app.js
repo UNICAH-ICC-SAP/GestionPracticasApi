@@ -4,6 +4,12 @@ const express = require('express');
 const cors = require('cors');
 const App = express();
 
+App.use(
+    cors({
+        origin: "https://gestionpracticas.netlify.app", // Reemplaza con el dominio correcto
+    })
+);
+
 App.use(cors())
 App.use(express.json());
 App.use(express.urlencoded({ extended: false }));
