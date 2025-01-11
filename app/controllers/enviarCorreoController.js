@@ -144,11 +144,10 @@ async function updateStatus(req, res) {
 
 // API para enviar el correo con la plantilla
 async function enviarCorreo(req, res) {
-    const entries = (Object.entries(req.body));
     const { correoId } = req.params;
     const { correoDestino, userId, nombreUsuario } = req.body;
 
-    if (!correoId || !correoDestino || !userId || !nombreUsuario) {
+    if (!correoId) {
         return res.status(400).json({
             message: 'Faltan datos requeridos',
             detalles: { correoDestino, userId, nombreUsuario }
@@ -164,15 +163,13 @@ async function enviarCorreo(req, res) {
             return res.status(404).json({ message: 'Plantilla no encontrada o inactiva.' });
         }
         let cuerpoPersonalizado = plantillaCorreo.cuerpo;
+        const entries = Object.entries(req.body);
         entries.forEach(item => {
             cuerpoPersonalizado = cuerpoPersonalizado
                 .replace(`{{${item[0]}}}`, he.encode(item[1]))
             console.log(item[0])
         });
-        /* eslint-disable no-undef */
-        cuerpoPersonalizado = cuerpoPersonalizado.replace('{{pass}}', process.env.EMAIL_PASSWORD)
-        /* eslint-enable no-undef */
-        console.log(cuerpoPersonalizado)
+
 
         const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
