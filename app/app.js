@@ -6,7 +6,7 @@ const App = express();
 
 App.use(
     cors({
-        origin: "https://gestionpracticas.netlify.app", // Reemplaza con el dominio correcto
+        origin: "*",// Reemplaza con el dominio correcto
     })
 );
 
@@ -30,6 +30,7 @@ const periodoRoutes = require('./routes/periodoRoutes');
 const seccionesRoutes = require('./routes/seccionesRoutes');
 const clasesDocenteRoutes = require('./routes/clasesDocentesRoutes');
 const correoRoutes = require('./routes/enviarCorreoRoutes');
+const plantillaAccionRoutes = require('./routes/plantillaAccionRoutes');
 
 //TODO: Put every route file here. App.use('api/test', test);
 App.use('/api/role', roleRoutes);
@@ -44,6 +45,7 @@ App.use('/api/ternas', ternaRoutes);
 App.use('/api/detalleTernas', detalleTernaRoutes);
 App.use('/api/pensum', pensumRoutes);
 App.use('/api/periodo', periodoRoutes);
+App.use('/api/plantillaAccion', plantillaAccionRoutes);
 
 App.use('/api/secciones', seccionesRoutes);
 App.use('/api/clasesDocentes', clasesDocenteRoutes);

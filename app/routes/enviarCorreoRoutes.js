@@ -10,7 +10,7 @@ correoRoutes.get('/obtenerPlantillas', auth.isAuth, async (req, res) => await co
     .post('/crearPlantilla', auth.isAuth, async (req, res) => await correoController.insert(req, res))
     .put('/actualizarPlantilla/:correoId', auth.isAuth, async (req, res) => await correoController.update(req, res))
     .put('/cambiarEstadoPlantilla/:correoId', auth.isAuth, async (req, res) => await correoController.updateStatus(req, res))
-    .post('/enviarCorreo/:correoId', auth.isAuth, async (req, res) => {
+    .post('/enviarCorreo/:accion', auth.isAuth, async (req, res) => {
         await correoController.enviarCorreo(req, res);
     });
 

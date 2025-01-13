@@ -35,7 +35,6 @@ async function signUp(req, res) {
                 message:
                     err.message || "Sucedio un error al obtener los registros de actores"
             });
-            console.log(err)
         });
 };
 
