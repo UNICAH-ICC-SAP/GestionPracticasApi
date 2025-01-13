@@ -4,22 +4,18 @@ const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
     const attributes = {
-        ternaId: {
+        idAccionPlantilla: {
             type: DataTypes.INTEGER,
             primaryKey: true,
+            autoIncrement: true,
         },
-        alumnoId: {
-            type: DataTypes.STRING(13)
+        accion: {
+            type: DataTypes.STRING(50)
         },
-        idEstadoTerna: {
+        plantillaCorreoId: {
             type: DataTypes.INTEGER,
-            allowNull: false, // Asumiendo que este campo es obligatorio
-            defaultValue: 1, // Asumiendo que el valor por defecto es 1 (ok)
-            validate: {
-                isIn: [[1, 2, 3]] // Validación para los tres estados: 1, 2, 3
-            }
-        }
-    };
+        },
+    }
     const options = {
         defaultScope: {
             //TODO: Exclude attributes by default here
@@ -28,9 +24,12 @@ module.exports = (sequelize) => {
         scopes: {
             //TODO: Includes attributes for scopes here
         },
-        tableName: 'terna',
+        tableName: 'accion_plantilla',
         timestamps: 'false'
     }
-
-    return sequelize.define('terna', attributes, options);
+    return sequelize.define('accionPlantilla', attributes, options);
+    // alumno.associate = function () {
+    //     alumno.hasOne(facultad, { foreignKey: 'facultadId', sourceKey: 'facultadId' })
+    // }
+    //  alumno;
 }

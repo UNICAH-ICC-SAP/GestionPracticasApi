@@ -46,11 +46,14 @@ db.carrera_clase_bloque = require("../models/carreraClaseBloqueModel")(sequelize
 db.periodos = require("../models/periodoModel")(sequelizeInstance, Sequelize);
 db.secciones = require("../models/seccionesModel")(sequelizeInstance, Sequelize);
 db.detalle_periodo = require("../models/seccionesModel")(sequelizeInstance, Sequelize);
+db.plantilla_correo = require("../models/enviarCorreoModel")(sequelizeInstance, Sequelize);
+db.accionCorreo = require("../models/plantillaAccionModel")(sequelizeInstance, Sequelize);
 
 // Relaciones
-// Alumno -< Facultad
-db.plantilla_correo = require("../models/enviarCorreoModel")(sequelizeInstance, Sequelize);
 
+// Accion >- Plantilla
+db.accionCorreo.belongsTo(db.plantilla_correo, { foreignKey: { name: 'plantillaCorreoId' } });
+db.plantilla_correo.hasMany(db.accionCorreo, { foreignKey: 'plantillaCorreoId', sourceKey: 'Id_correo' });
 //alumno -< facultad
 db.alumno.belongsTo(db.facultad, { foreignKey: { name: 'facultadId', } });
 db.facultad.hasMany(db.alumno, { foreignKey: 'facultadId', sourceKey: 'facultadId' });

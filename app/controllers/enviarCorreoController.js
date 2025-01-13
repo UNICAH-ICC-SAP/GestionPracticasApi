@@ -2,6 +2,7 @@
 
 const db = require('../config/db');
 const Plantilla_Correo = db.plantilla_correo;
+const AccionesPlantillaCorreo = db.accionCorreo;
 const nodemailer = require('nodemailer'); // Importar Nodemailer
 const he = require('he');
 require('dotenv').config();
@@ -144,56 +145,64 @@ async function updateStatus(req, res) {
 
 // API para enviar el correo con la plantilla
 async function enviarCorreo(req, res) {
-    const { correoId } = req.params;
-    const { correoDestino, userId, nombreUsuario } = req.body;
-
-    if (!correoId) {
+    const { accion } = req.params;
+    console.log(accion)
+    const { correoDestino } = req.body;
+    if (!accion) {
         return res.status(400).json({
             message: 'Faltan datos requeridos',
-            detalles: { correoDestino, userId, nombreUsuario }
         });
     }
 
-    try {
-        const plantillaCorreo = await Plantilla_Correo.findOne({
-            where: { Id_correo: parseInt(correoId, 10), estado: 1 }
-        });
+    // try {
+    //     const plantillaCorreo = await Plantilla_Correo.findOne({
+    //         where: { Id_correo: parseInt(correoId, 10), estado: 1 }
+    //     });
 
-        if (!plantillaCorreo) {
-            return res.status(404).json({ message: 'Plantilla no encontrada o inactiva.' });
-        }
-        let cuerpoPersonalizado = plantillaCorreo.cuerpo;
-        const entries = Object.entries(req.body);
-        entries.forEach(item => {
-            cuerpoPersonalizado = cuerpoPersonalizado
-                .replace(`{{${item[0]}}}`, he.encode(item[1]))
-            console.log(item[0])
-        });
+    const accionPlantilla = await AccionesPlantillaCorreo.findOne({
+        where: { accion: accion },
+        include: [
+            {
+                model: Plantilla_Correo,
+            }
+        ]
+    }).then(dataValues => { return dataValues["dataValues"].plantilla_correo["dataValues"] });
+    console.log(accionPlantilla)
+    if (!accionPlantilla) {
+        return res.status(404).send({ message: 'Plantilla no encontrada o inactiva.' });
+    }
+    let cuerpoPersonalizado = accionPlantilla.cuerpo;
+
+    const entries = Object.entries(req.body);
+    console.log(entries)
+    entries.forEach(item => {
+        cuerpoPersonalizado = cuerpoPersonalizado.replace(`{{${item[0]}}}`, he.encode(item[1]))
+        console.log(item[0])
+    });
 
 
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 587,
-            secure: false, // upgrade later with STARTTLS
-            auth: {
-                user: plantillaCorreo.correo_origen,
-                pass: plantillaCorreo.correo_password,
-            },
-        });
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // upgrade later with STARTTLS
+        auth: {
+            user: accionPlantilla.correo_origen,
+            pass: accionPlantilla.correo_password,
+        },
+    });
 
-        const mailOptions = {
-            from: `Unidad Acádemica SAP ${he.encode(plantillaCorreo.correo_origen)}`,
-            to: he.encode(correoDestino),
-            subject: he.encode(plantillaCorreo.asunto),
-            html: cuerpoPersonalizado
-        };
+    const mailOptions = {
+        from: `Unidad Acádemica SAP ${he.encode(accionPlantilla.correo_origen)}`,
+        to: he.encode(correoDestino),
+        subject: he.encode(accionPlantilla.asunto),
+        html: cuerpoPersonalizado
+    };
 
-        await transporter.sendMail(mailOptions).then(result => {
-            res.status(200).json({ message: 'Correo enviado exitosamente', detalles: result });
+    await transporter.sendMail(mailOptions)
+        .then(result => {
+            res.status(200).send({ message: 'Correo enviado exitosamente', detalles: result });
             transporter.close();
+        }).catch(error => {
+            res.status(500).send({ message: 'Error al enviar correo', error: error.message });
         });
-
-    } catch (error) {
-        res.status(500).json({ message: 'Error al enviar correo', error: error.message });
-    }
 }

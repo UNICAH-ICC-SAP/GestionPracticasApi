@@ -4,36 +4,36 @@ const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
     const attributes = {
-        Id_correo: { 
+        Id_correo: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true, 
+            autoIncrement: true,
         },
-        correo_origen: { 
-            type: DataTypes.STRING(50), 
-            allowNull: false, 
+        correo_origen: {
+            type: DataTypes.STRING(50),
+            allowNull: false,
         },
-        correo_password: { 
+        correo_password: {
             type: DataTypes.STRING(100),
-            allowNull: false, 
+            allowNull: false,
         },
         asunto: {
             type: DataTypes.STRING(100),
             allowNull: false, // Definir que no puede ser nulo para mayor control
         },
         cuerpo: {
-            type: DataTypes.TEXT, 
+            type: DataTypes.TEXT,
             allowNull: false, // Definir que no puede ser nulo para asegurar contenido
         },
         estado: {
-            type: DataTypes.BOOLEAN, 
-            defaultValue: true, 
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
         },
     };
 
     const options = {
         defaultScope: {
-            attributes: { exclude: ['createdAt', 'updatedAt'] } 
+            attributes: { exclude: ['createdAt', 'updatedAt'] }
         },
         scopes: {
             // Aquí podrías agregar un scope para obtener solo los correos activos
