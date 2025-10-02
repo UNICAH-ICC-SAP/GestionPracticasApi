@@ -166,11 +166,6 @@ async function enviarCorreo(req, res) {
                 model: Plantilla_Correo,
             }
         ]
-    }).then(dataValues => {
-        return dataValues;
-    }).catch(err => {
-        console.log(err);
-        return null;
     });
     const accionPlantilla = accionPlantillaResponse.plantilla_correo.get({ plain: true });
     console.log(accionPlantilla)
