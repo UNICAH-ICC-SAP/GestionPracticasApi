@@ -159,14 +159,20 @@ async function enviarCorreo(req, res) {
     //         where: { Id_correo: parseInt(correoId, 10), estado: 1 }
     //     });
 
-    const accionPlantilla = await AccionesPlantillaCorreo.findOne({
+    const accionPlantillaResponse = await AccionesPlantillaCorreo.findOne({
         where: { accion: accion },
         include: [
             {
                 model: Plantilla_Correo,
             }
         ]
-    }).then(dataValues => { return dataValues["dataValues"].plantilla_correo["dataValues"] });
+    }).then(dataValues => {
+        return dataValues;
+    }).catch(err => {
+        console.log(err);
+        return null;
+    });
+    const accionPlantilla = accionPlantillaResponse.plantilla_correo.get({ plain: true });
     console.log(accionPlantilla)
     if (!accionPlantilla) {
         return res.status(404).send({ message: 'Plantilla no encontrada o inactiva.' });
@@ -182,15 +188,15 @@ async function enviarCorreo(req, res) {
 
 
     const transporter = nodemailer.createTransport({
+        service: 'gmail',
         host: "smtp.gmail.com",
         port: 587,
-        secure: false, // upgrade later with STARTTLS
+        secure: true, // upgrade later with STARTTLS
         auth: {
             user: accionPlantilla.correo_origen,
             pass: accionPlantilla.correo_password,
         },
     });
-
     const mailOptions = {
         from: `Unidad Acádemica SAP ${he.encode(accionPlantilla.correo_origen)}`,
         to: he.encode(correoDestino),
