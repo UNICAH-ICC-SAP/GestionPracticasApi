@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.13](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.12...v1.4.13) (2025-10-02)
+
+
+### Bug Fixes
+
+* envio de correo test live ([33a23b5](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/33a23b5a1dea4a2d41a5149091e0782c4b784c69))
+
 ### [1.4.12](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.11...v1.4.12) (2025-10-02)
 
 
