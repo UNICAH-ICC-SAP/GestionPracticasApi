@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.14](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.13...v1.4.14) (2025-10-04)
+
+
+### Bug Fixes
+
+* cambios en propiedad coordina a rol ([4a35baa](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/4a35baac1c53d1e1027b9aeb353cf589f2544596))
+
 ### [1.4.13](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.12...v1.4.13) (2025-10-02)
 
 
