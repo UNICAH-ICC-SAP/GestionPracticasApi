@@ -15,8 +15,8 @@ module.exports = (sequelize) => {
         docenteId: {
             type: DataTypes.STRING(13)
         },
-        coordina: {
-            type: DataTypes.BOOLEAN
+        rol: {
+            type: DataTypes.STRING(9)
         }
     }
     const options = {
@@ -31,5 +31,5 @@ module.exports = (sequelize) => {
         timestamps: 'false'
     }
 
-    return sequelize.define('detalle_terna', attributes, options);
+    return sequelize.define('detalleTerna', attributes, options);
 }
