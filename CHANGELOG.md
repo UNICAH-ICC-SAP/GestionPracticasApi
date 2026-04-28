@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.14...v1.5.0) (2026-04-28)
+
+
+### Features
+
+* documentacion estudiante y mejoras en control de routas por roles y permisos ([8d1be90](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/8d1be90d9299d8388d0e5b836f906455093c692b))
+
+
+### Bug Fixes
+
+* deploy ([963978e](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/963978e3c8cfa727d471649bff54a19076136e21))
+
 ### [1.4.14](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.13...v1.4.14) (2025-10-04)
 
 
