@@ -31,7 +31,6 @@ const seccionesRoutes = require('./routes/seccionesRoutes');
 const clasesDocenteRoutes = require('./routes/clasesDocentesRoutes');
 const correoRoutes = require('./routes/enviarCorreoRoutes');
 const plantillaAccionRoutes = require('./routes/plantillaAccionRoutes');
-const fileRoutes = require('./routes/fileRoutes');
 const userPermissionRoutes = require('./routes/userPermissionRoutes')
 const rolePermissionRoutes = require('./routes/rolePermissionsRoutes')
 
@@ -53,7 +52,6 @@ App.use('/api/plantillaAccion', plantillaAccionRoutes);
 App.use('/api/secciones', seccionesRoutes);
 App.use('/api/clasesDocentes', clasesDocenteRoutes);
 App.use('/api/correo', correoRoutes);
-App.use('/api/files', fileRoutes);
 App.use('/api/userPermission', userPermissionRoutes);
 App.use('/api/rolePermission', rolePermissionRoutes);
 
