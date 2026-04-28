@@ -4,20 +4,16 @@ const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
     const attributes = {
-        permissionId: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
+        documentoId: {
+            type: DataTypes.STRING(255),
             primaryKey: true
         },
-        name: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            unique: true
+        nombreArchivo: {
+            type: DataTypes.STRING(50)
         },
-        description: {
-            type: DataTypes.STRING(255),
-            allowNull: true
-        }
+        ruta: {
+            type: DataTypes.STRING(255)
+        },
     }
     const options = {
         defaultScope: {
@@ -27,9 +23,9 @@ module.exports = (sequelize) => {
         scopes: {
             //TODO: Includes attributes for scopes here
         },
-        tableName: 'permissions',
-        timestamps: false
+        tableName: 'user',
+        timestamps: 'false'
     }
 
-    return sequelize.define('permissions', attributes, options);
+    return sequelize.define('users', attributes, options);
 }

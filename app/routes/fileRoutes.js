@@ -1,15 +1,13 @@
-// app/routes/file.routes.js
-'use strict';
+'use strict'
 
-const apiRoutes = require('express').Router();
+const express = require('express');
 const fileController = require('../controllers/fileController');
 const auth = require('../middlewares/auth')
+const apiRoutes = express.Router();
 
-apiRoutes
-    .post('/signed-urls', auth.isAuth, async (req, res) => await fileController.createSignedUrlUser(req, res))
-    .post('/download-url', auth.isAuth, async (req, res) => await fileController.getDownloadUrl(req, res))
-    .post('/update-signed-urls', auth.isAuth, async (req, res) => await fileController.updateCreateSignedUrlUser(req, res))
-    .patch('/updateFileStatus', auth.isAuth, async (req, res) => await fileController.updateFileStatus(req, res))
-    .post('/list', auth.isAuth, async (req, res) => await fileController.findAllByUser(req, res));
+apiRoutes.post('/uploadDocument', auth.isAuth, async (req, res) => await fileController.uploadDocument(req, res))
+    .get('/dowloadDocument', auth.isAuth, async (req, res) => await fileController.downloadDocument(req, res))
+    .get('/getFiles', auth.isAuth, async (req, res) => await fileController.getFiles(req, res))
+// .post('/insert', auth.isAuth, async (req, res) => await facultadController.insert(req, res));
 
 module.exports = apiRoutes;

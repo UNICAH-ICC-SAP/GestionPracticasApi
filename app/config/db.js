@@ -48,10 +48,6 @@ db.accionCorreo = require("../models/plantillaAccionModel")(sequelizeInstance, S
 db.permissions = require("../models/permissionModel")(sequelizeInstance, Sequelize);
 db.userPermission = require("../models/userPermissionsModel")(sequelizeInstance, Sequelize);
 db.rolePermission = require("../models/rolePermissionsModel")(sequelizeInstance, Sequelize);
-db.file = require('../models/fileModel')(sequelizeInstance, Sequelize);
-db.horario_disponibilidad = require('../models/horarioDisponibilidadModel')(sequelizeInstance, Sequelize);
-db.comentario = require('../models/comentarioModel')(sequelizeInstance, Sequelize);
-
 // Relaciones
 db.accionCorreo.belongsTo(db.plantilla_correo, { foreignKey: { name: 'plantillaCorreoId' } });
 db.plantilla_correo.hasMany(db.accionCorreo, { foreignKey: 'plantillaCorreoId', sourceKey: 'Id_correo' });
@@ -92,6 +88,12 @@ db.carrera_clase_bloque.hasMany(db.detalle_periodo, {
 db.detalle_periodo.belongsTo(db.periodos, { foreignKey: { name: 'id_periodo' } });
 db.periodos.hasMany(db.detalle_periodo, { foreignKey: 'id_periodo', sourceKey: 'id_periodo' });
 
+
+db.detalle_periodo.belongsTo(db.carrera_clase_bloque, {
+    foreignKey: 'id_ccb',
+    as: 'clase'
+});
+
 db.permissions.belongsToMany(db.role, {
     through: db.rolePermission,
     foreignKey: 'permissionId',
@@ -104,8 +106,13 @@ db.role.belongsToMany(db.permissions, {
     otherKey: 'permissionId'
 });
 
-db.rolePermission.belongsTo(db.role, { foreignKey: 'roleId' });
-db.rolePermission.belongsTo(db.permissions, { foreignKey: 'permissionId' });
+db.rolePermission.belongsTo(db.role, {
+    foreignKey: 'roleId'
+});
+
+db.rolePermission.belongsTo(db.permissions, {
+    foreignKey: 'permissionId'
+});
 
 db.users.belongsToMany(db.permissions, {
     through: db.userPermission,
@@ -119,20 +126,12 @@ db.permissions.belongsToMany(db.users, {
     otherKey: 'userId'
 });
 
-db.userPermission.belongsTo(db.users, { foreignKey: 'userId' });
-db.userPermission.belongsTo(db.permissions, { foreignKey: 'permissionId' });
-
-db.users.hasMany(db.file, {
-    foreignKey: 'userId',
-    sourceKey: 'userId'
+db.userPermission.belongsTo(db.users, {
+    foreignKey: 'userId'
 });
 
-db.file.belongsTo(db.users, {
-    foreignKey: 'userId',
-    targetKey: 'userId'
+db.userPermission.belongsTo(db.permissions, {
+    foreignKey: 'permissionId'
 });
-
-db.horario_disponibilidad.belongsTo(db.docente, { foreignKey: { name: 'docenteId' } });
-db.docente.hasMany(db.horario_disponibilidad, { foreignKey: 'docenteId', sourceKey: 'docenteId' });
 
 module.exports = db;

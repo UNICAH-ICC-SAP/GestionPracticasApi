@@ -28,12 +28,9 @@ const seccionesRoutes = require('./routes/seccionesRoutes');
 const clasesDocenteRoutes = require('./routes/clasesDocentesRoutes');
 const correoRoutes = require('./routes/enviarCorreoRoutes');
 const plantillaAccionRoutes = require('./routes/plantillaAccionRoutes');
+const fileRoutes = require('./routes/fileRoutes');
 const userPermissionRoutes = require('./routes/userPermissionRoutes')
 const rolePermissionRoutes = require('./routes/rolePermissionsRoutes')
-const fileRoutes = require('./routes/fileRoutes');
-const reporteRoutes = require('./routes/reportesRoutes');
-const horarioDisponibilidadRoutes = require('./routes/horarioDisponibilidadRoutes');
-const comentarioRoutes = require('./routes/comentarioRoutes');
 
 
 //TODO: Put every route file here. App.use('api/test', test);
@@ -50,11 +47,8 @@ App.use('/api/plantillaAccion', plantillaAccionRoutes);
 App.use('/api/secciones', seccionesRoutes);
 App.use('/api/clasesDocentes', clasesDocenteRoutes);
 App.use('/api/correo', correoRoutes);
+App.use('/api/files', fileRoutes);
 App.use('/api/userPermission', userPermissionRoutes);
 App.use('/api/rolePermission', rolePermissionRoutes);
-App.use('/api/files', fileRoutes);
-App.use('/api/reportes', reporteRoutes);
-App.use('/api/horario', horarioDisponibilidadRoutes);
-App.use('/api/comentarios', comentarioRoutes);
 
 module.exports = App;
