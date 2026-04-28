@@ -64,8 +64,8 @@ async function findAllData(req, res) {
 }
 
 async function findBy(req, res) {
-    Alumno.findAll({ where: req.query, include: [{ model: Facultad }]})
-    
+    Alumno.findAll({ where: req.query, include: [{ model: Facultad }] })
+
         .then(data => {
             const newData = {
                 userId: data[0].alumnoId,
@@ -133,12 +133,12 @@ async function updateStatus(req, res) {
             });
         } else {
             res.status(404).send({
-                message:`No se pudo encontrar ni desactivar el alumno con ID=${alumnoId}`
+                message: `No se pudo encontrar ni desactivar el alumno con ID=${alumnoId}`
             });
         }
     } catch (error) {
         res.status(500).send({
             message: error.message || "Sucedió un error al desactivar el alumno."
-   });
-}
+        });
+    }
 }

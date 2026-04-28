@@ -48,7 +48,9 @@ db.secciones = require("../models/seccionesModel")(sequelizeInstance, Sequelize)
 db.detalle_periodo = require("../models/seccionesModel")(sequelizeInstance, Sequelize);
 db.plantilla_correo = require("../models/enviarCorreoModel")(sequelizeInstance, Sequelize);
 db.accionCorreo = require("../models/plantillaAccionModel")(sequelizeInstance, Sequelize);
-
+db.permissions = require("../models/permissionModel")(sequelizeInstance, Sequelize);
+db.userPermission = require("../models/userPermissionsModel")(sequelizeInstance, Sequelize);
+db.rolePermission = require("../models/rolePermissionsModel")(sequelizeInstance, Sequelize);
 // Relaciones
 
 // Accion >- Plantilla
@@ -117,4 +119,45 @@ db.detalle_periodo.belongsTo(db.carrera_clase_bloque, {
     foreignKey: 'id_ccb',
     as: 'clase'
 });
+
+db.permissions.belongsToMany(db.role, {
+    through: db.rolePermission,
+    foreignKey: 'permissionId',
+    otherKey: 'roleId'
+});
+
+db.role.belongsToMany(db.permissions, {
+    through: db.rolePermission,
+    foreignKey: 'roleId',
+    otherKey: 'permissionId'
+});
+
+db.rolePermission.belongsTo(db.role, {
+    foreignKey: 'roleId'
+});
+
+db.rolePermission.belongsTo(db.permissions, {
+    foreignKey: 'permissionId'
+});
+
+db.users.belongsToMany(db.permissions, {
+    through: db.userPermission,
+    foreignKey: 'userId',
+    otherKey: 'permissionId'
+});
+
+db.permissions.belongsToMany(db.users, {
+    through: db.userPermission,
+    foreignKey: 'permissionId',
+    otherKey: 'userId'
+});
+
+db.userPermission.belongsTo(db.users, {
+    foreignKey: 'userId'
+});
+
+db.userPermission.belongsTo(db.permissions, {
+    foreignKey: 'permissionId'
+});
+
 module.exports = db;

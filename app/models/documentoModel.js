@@ -14,9 +14,6 @@ module.exports = (sequelize) => {
         ruta: {
             type: DataTypes.STRING(255)
         },
-        estado: {
-            type: DataTypes.BOOLEAN
-        }
     }
     const options = {
         defaultScope: {

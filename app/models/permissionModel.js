@@ -4,16 +4,19 @@ const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
     const attributes = {
-        documentacionId: {
+        permissionId: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
+            autoIncrement: true,
+            primaryKey: true
         },
-        detalleDocumentacionId: {
-            type: DataTypes.INTEGER
+        name: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+            unique: true
         },
-        alumnoId: {
-            type: DataTypes.STRING(13)
+        description: {
+            type: DataTypes.STRING(255),
+            allowNull: true
         }
     }
     const options = {
@@ -24,9 +27,9 @@ module.exports = (sequelize) => {
         scopes: {
             //TODO: Includes attributes for scopes here
         },
-        tableName: 'documentacion',
+        tableName: 'permissions',
         timestamps: 'false'
     }
 
-    return sequelize.define('documentacions', attributes, options);
+    return sequelize.define('permissions', attributes, options);
 }
