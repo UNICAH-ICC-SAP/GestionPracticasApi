@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.5.0...v1.6.0) (2026-05-06)
+
+
+### Features
+
+* adicion de configuraciones para modelos de archivos ([82cbf56](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/82cbf565a7a1c0ec9c461b16692248a01f9566eb))
+* adicion modelo, controlado y rutas para gestion de archivos, configuracion de gcp y token ([1d32645](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/1d3264530dd43c3d9f7bdb5c4508178edb1ddc3d))
+* eliminacion de archivos innecesarios ([1416e7a](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/1416e7a00f894901426fda3c19a3a4f095dad51d))
+
 ## [1.5.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.14...v1.5.0) (2026-04-28)
 
 
