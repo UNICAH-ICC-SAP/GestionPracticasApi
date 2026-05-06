@@ -30,6 +30,7 @@ const correoRoutes = require('./routes/enviarCorreoRoutes');
 const plantillaAccionRoutes = require('./routes/plantillaAccionRoutes');
 const userPermissionRoutes = require('./routes/userPermissionRoutes')
 const rolePermissionRoutes = require('./routes/rolePermissionsRoutes')
+const fileRoutes = require('./routes/fileRoutes');
 
 
 //TODO: Put every route file here. App.use('api/test', test);
@@ -48,5 +49,6 @@ App.use('/api/clasesDocentes', clasesDocenteRoutes);
 App.use('/api/correo', correoRoutes);
 App.use('/api/userPermission', userPermissionRoutes);
 App.use('/api/rolePermission', rolePermissionRoutes);
+App.use('/api/files', fileRoutes);
 
 module.exports = App;

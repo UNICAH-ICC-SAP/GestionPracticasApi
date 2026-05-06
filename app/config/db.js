@@ -48,6 +48,7 @@ db.accionCorreo = require("../models/plantillaAccionModel")(sequelizeInstance, S
 db.permissions = require("../models/permissionModel")(sequelizeInstance, Sequelize);
 db.userPermission = require("../models/userPermissionsModel")(sequelizeInstance, Sequelize);
 db.rolePermission = require("../models/rolePermissionsModel")(sequelizeInstance, Sequelize);
+db.file = require('../models/fileModel')(sequelizeInstance, Sequelize);
 // Relaciones
 db.accionCorreo.belongsTo(db.plantilla_correo, { foreignKey: { name: 'plantillaCorreoId' } });
 db.plantilla_correo.hasMany(db.accionCorreo, { foreignKey: 'plantillaCorreoId', sourceKey: 'Id_correo' });
@@ -132,6 +133,17 @@ db.userPermission.belongsTo(db.users, {
 
 db.userPermission.belongsTo(db.permissions, {
     foreignKey: 'permissionId'
+});
+
+// Un usuario tiene muchos archivos
+db.users.hasMany(db.file, {
+    foreignKey: 'userId',
+    sourceKey: 'userId'
+});
+
+db.file.belongsTo(db.users, {
+    foreignKey: 'userId',
+    targetKey: 'userId'
 });
 
 module.exports = db;

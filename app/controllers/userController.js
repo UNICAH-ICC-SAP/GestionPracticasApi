@@ -3,11 +3,13 @@
 const db = require('../config/db');
 const User = db.users;
 const bcrypt = require('bcrypt');
-const crypto = require('crypto');
 const service = require('../services/tokenService');
 
-function validPassword(value) {
-    return typeof value === 'string' && value.length >= 12 && Buffer.byteLength(value, 'utf8') <= 72;
+module.exports = {
+    signUp,
+    signIn,
+    getUserInfo,
+    resetPassword
 }
 
 async function signUp(req, res) {
