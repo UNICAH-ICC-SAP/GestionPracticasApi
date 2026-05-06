@@ -20,9 +20,6 @@ const usuarioRoutes = require('./routes/userRoutes');
 const facultadRoutes = require('./routes/facultadRoutes');
 const docenteRoutes = require('./routes/docenteRoutes');
 const alumnoRoutes = require('./routes/alumnoRoutes');
-const documentacionRoutes = require('./routes/documentacionRoutes');
-const detalleDocumentacionRoutes = require('./routes/detalleDocumentacionRoutes');
-const documentoRoutes = require('./routes/docenteRoutes');
 const ternaRoutes = require('./routes/ternaRoutes');
 const detalleTernaRoutes = require('./routes/detalleTernaRoutes');
 const pensumRoutes = require('./routes/pensumRoutes');
@@ -33,6 +30,7 @@ const correoRoutes = require('./routes/enviarCorreoRoutes');
 const plantillaAccionRoutes = require('./routes/plantillaAccionRoutes');
 const userPermissionRoutes = require('./routes/userPermissionRoutes')
 const rolePermissionRoutes = require('./routes/rolePermissionsRoutes')
+const fileRoutes = require('./routes/fileRoutes');
 
 
 //TODO: Put every route file here. App.use('api/test', test);
@@ -41,9 +39,6 @@ App.use('/api/user', usuarioRoutes);
 App.use('/api/facultad', facultadRoutes);
 App.use('/api/docente', docenteRoutes);
 App.use('/api/alumno', alumnoRoutes);
-App.use('/api/documentacion', documentacionRoutes);
-App.use('/api/detalleDocumentacion', detalleDocumentacionRoutes);
-App.use('/api/documentos', documentoRoutes);
 App.use('/api/ternas', ternaRoutes);
 App.use('/api/detalleTernas', detalleTernaRoutes);
 App.use('/api/pensum', pensumRoutes);
@@ -54,5 +49,6 @@ App.use('/api/clasesDocentes', clasesDocenteRoutes);
 App.use('/api/correo', correoRoutes);
 App.use('/api/userPermission', userPermissionRoutes);
 App.use('/api/rolePermission', rolePermissionRoutes);
+App.use('/api/files', fileRoutes);
 
 module.exports = App;

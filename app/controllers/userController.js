@@ -4,7 +4,7 @@ const db = require('../config/db')
 const User = db.users;
 const { Op } = require('sequelize')
 const bcrypt = require('bcrypt');
-const service = require('../services/services');
+const service = require('../services/tokenService');
 
 module.exports = {
     signUp,

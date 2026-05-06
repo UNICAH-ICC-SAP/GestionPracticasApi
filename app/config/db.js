@@ -36,9 +36,6 @@ db.docente = require("../models/docenteModel")(sequelizeInstance, Sequelize);
 db.alumno = require("../models/alumnoModel")(sequelizeInstance, Sequelize);
 db.facultad = require("../models/facultadModel")(sequelizeInstance, Sequelize);
 db.role = require("../models/roleModel")(sequelizeInstance, Sequelize);
-db.documentacion = require("../models/documentacionModel")(sequelizeInstance, Sequelize);
-db.detalleDocumentacion = require("../models/detalleDocumentacionModel")(sequelizeInstance, Sequelize);
-db.documento = require("../models/documentoModel")(sequelizeInstance, Sequelize);
 db.terna = require("../models/ternaModel")(sequelizeInstance, Sequelize);
 db.detalleTerna = require("../models/detalleTernaModel")(sequelizeInstance, Sequelize);
 db.clases = require("../models/claseModel")(sequelizeInstance, Sequelize);
@@ -51,6 +48,7 @@ db.accionCorreo = require("../models/plantillaAccionModel")(sequelizeInstance, S
 db.permissions = require("../models/permissionModel")(sequelizeInstance, Sequelize);
 db.userPermission = require("../models/userPermissionsModel")(sequelizeInstance, Sequelize);
 db.rolePermission = require("../models/rolePermissionsModel")(sequelizeInstance, Sequelize);
+db.file = require('../models/fileModel')(sequelizeInstance, Sequelize);
 // Relaciones
 
 // Accion >- Plantilla
@@ -158,6 +156,17 @@ db.userPermission.belongsTo(db.users, {
 
 db.userPermission.belongsTo(db.permissions, {
     foreignKey: 'permissionId'
+});
+
+// Un usuario tiene muchos archivos
+db.users.hasMany(db.file, {
+    foreignKey: 'userId',
+    sourceKey: 'userId'
+});
+
+db.file.belongsTo(db.users, {
+    foreignKey: 'userId',
+    targetKey: 'userId'
 });
 
 module.exports = db;
