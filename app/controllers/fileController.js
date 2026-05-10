@@ -50,7 +50,7 @@ async function createSignedUrlUser(req, res) {
                 userFolder: signedFile.userFolder,
                 uploadUrl: signedFile.uploadUrl,
                 fileUrl: signedFile.fileUrl,
-                fileTypeId
+                fileTypeId: record.fileTypeId
             }
         });
 
