@@ -7,7 +7,6 @@ const Alumno = db.alumno;
 const Docente = db.docente;
 const File = db.file;
 const { isEmpty } = require('lodash')
-const { isAdmin, canAccessStudent } = require('../services/accessService');
 
 async function insert(req, res) {
     const terna = req.body;
@@ -62,16 +61,8 @@ async function updateTerna(req, res) {
             });
         }
 
-        if ((!isAdmin(req.user) && Number(req.user.roleId) !== 2) ||
-            !await canAccessStudent(req.user, terna.alumnoId)) {
-            return res.status(403).send({ message: 'No tienes permiso para modificar esta terna.' });
-        }
-        if (![1, 2, 3, 4, 5].includes(Number(estadoTerna))) {
-            return res.status(400).send({ message: 'El estado de la terna no es válido.' });
-        }
-
         await terna.update({
-            idEstadoTerna: Number(estadoTerna),
+            idEstadoTerna: estadoTerna,
         });
 
         return res.status(200).send({
@@ -79,114 +70,12 @@ async function updateTerna(req, res) {
         });
     } catch (error) {
         console.error(error);
+
         return res.status(500).send({
             message: 'Error actualizando terna'
         });
     }
-}
 
-async function cancelarTerna(req, res) {
-    try {
-        const { idTerna } = req.body;
-        const terna = await Terna.findByPk(idTerna);
-
-        if (!terna) {
-            return res.status(404).send({ message: 'Terna no encontrada' });
-        }
-
-        await terna.update({ idEstadoTerna: 3 });
-
-        return res.status(200).send({ message: 'Terna cancelada correctamente' });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).send({ message: 'Error al cancelar la terna' });
-    }
-}
-
-async function getMonografiaCompleta(req, res) {
-    try {
-        const { ternaId } = req.query;
-
-        if (!ternaId) {
-            return res.status(400).send({ message: 'ternaId es requerido' });
-        }
-
-        const terna = await Terna.findOne({
-            where: { ternaId },
-            include: [
-                { model: Alumno },
-                {
-                    model: DetalleTerna,
-                    include: [{ model: Docente }]
-                }
-            ]
-        });
-
-        if (!terna) {
-            return res.status(404).send({ message: 'Terna no encontrada' });
-        }
-
-        const monografiaFile = await File.findOne({
-            where: {
-                userId: terna.alumnoId,
-                fileTypeId: 6
-            }
-        });
-
-        const StatusTernaMap = {
-            1: 'Inactiva',
-            2: 'En Curso',
-            3: 'Revision Monografia',
-            4: 'Agendada',
-            5: 'Finalizada'
-        };
-
-        const RolMap = {
-            'coordina': 'Coordinador',
-            'estilo': 'Revisor de Estilos',
-            'tecnico': 'Revisor Tecnico'
-        };
-
-        const ternaData = terna.toJSON();
-
-        const docentes = (ternaData.detalleTernas || []).map(dt => ({
-            docenteId: dt.docenteId,
-            nombre: dt.docente ? dt.docente.nombre : 'Sin nombre',
-            email: dt.docente ? dt.docente.email : '',
-            telefono: dt.docente ? dt.docente.telefono : '',
-            rol: RolMap[dt.rol] || dt.rol
-        }));
-
-        const response = {
-            ternaId: ternaData.ternaId,
-            estado: StatusTernaMap[ternaData.idEstadoTerna] || 'Desconocido',
-            idEstadoTerna: ternaData.idEstadoTerna,
-            alumno: {
-                alumnoId: ternaData.alumno ? ternaData.alumno.alumnoId : '',
-                nombre: ternaData.alumno ? ternaData.alumno.nombre : 'Sin nombre',
-                email: ternaData.alumno ? ternaData.alumno.email : '',
-                telefono: ternaData.alumno ? ternaData.alumno.telefono : '',
-                facultadId: ternaData.alumno ? ternaData.alumno.facultadId : ''
-            },
-            docentes,
-            monografia: monografiaFile ? {
-                archivoId: monografiaFile.archivoId,
-                originalName: monografiaFile.originalName,
-                fileUrl: monografiaFile.fileUrl,
-                status: monografiaFile.status,
-                fileStatus: monografiaFile.fileStatus,
-                mimeType: monografiaFile.mimeType,
-                sizeBytes: monografiaFile.sizeBytes
-            } : null
-        };
-
-        return res.status(200).send(response);
-    } catch (error) {
-        console.error('Error en getMonografiaCompleta:', error);
-        return res.status(500).send({
-            message: error.message || 'Error al obtener datos de monografia'
-        });
-    }
 }
 
 module.exports = {
@@ -194,6 +83,4 @@ module.exports = {
     findBy,
     insert,
     updateTerna,
-    cancelarTerna,
-    getMonografiaCompleta,
 }
