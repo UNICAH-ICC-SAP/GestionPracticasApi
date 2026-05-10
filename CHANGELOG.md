@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.6.0...v1.7.0) (2026-05-10)
+
+
+### Features
+
+* mejoras en rutas y controladores ([8b348bf](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/8b348bfba2f5332dc6bf1d4a14043ae3d224a403))
+
 ## [1.6.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.5.0...v1.6.0) (2026-05-06)
 
 
