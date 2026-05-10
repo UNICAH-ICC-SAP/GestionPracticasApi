@@ -6,12 +6,6 @@ const DetalleTerna = db.detalleTerna;
 const Alumno = db.alumno;
 const { isEmpty } = require('lodash')
 
-module.exports = {
-    findAll,
-    findBy,
-    insert
-}
-
 async function insert(req, res) {
     const terna = req.body;
     Terna.create({
@@ -54,4 +48,39 @@ async function findBy(req, res) {
                 message: err.message || "Sucedio un error al obtener los registros de Alumnoes"
             })
         })
+}
+
+async function updateTerna(req, res) {
+    try {
+        const { idTerna, estadoTerna } = req.body;
+        const terna = await Terna.findByPk(idTerna);
+
+        if (!terna) {
+            return res.status(404).send({
+                message: 'Terna no encontrada'
+            });
+        }
+
+        await terna.update({
+            idEstadoTerna: estadoTerna,
+        });
+
+        return res.status(200).send({
+            message: `Terna Actualizada`
+        });
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).send({
+            message: 'Error actualizando terna'
+        });
+    }
+
+}
+
+module.exports = {
+    findAll,
+    findBy,
+    insert,
+    updateTerna,
 }

@@ -16,7 +16,7 @@ module.exports = (sequelize) => {
             allowNull: false, // Asumiendo que este campo es obligatorio
             defaultValue: 1, // Asumiendo que el valor por defecto es 1 (ok)
             validate: {
-                isIn: [[1, 2, 3]] // Validación para los tres estados: 1, 2, 3
+                isIn: [[1, 2, 3, 4, 5]] // Validación para los tres estados: 1, 2, 3
             }
         }
     };
