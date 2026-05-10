@@ -11,8 +11,8 @@ App.use(
 );
 
 App.use(cors())
-App.use(express.json());
-App.use(express.urlencoded({ extended: false }));
+App.use(express.json({ limit: '50mb' }));
+App.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
 //TODO: put every controller here. const test = requires('./routes/test')
 const roleRoutes = require('./routes/roleRoutes');
