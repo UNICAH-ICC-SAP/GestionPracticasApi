@@ -5,6 +5,7 @@ const Periodo = db.periodos;
 const DetallePeriodo = db.detalle_periodo;
 const CarreraClaseBloque = db.carrera_clase_bloque;
 const Clase = db.clases;
+const HorarioDisponibilidad = db.horario_disponibilidad;
 const { Op } = require('sequelize');
 
 module.exports = {
@@ -15,18 +16,47 @@ module.exports = {
 };
 
 async function get(req, res) {
-    const id_periodo = req.query.id_periodo;
-    DetallePeriodo.findAll({
-        where: { id_periodo: id_periodo }
-    })
-        .then(data => {
-            res.status(200).send(data);
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "Sucedió un error al obtener los registros de DetallePeriodos"
-            });
+    try {
+        const { id_periodo, docenteId, id_clase } = req.query;
+
+        if (!id_periodo) {
+            return res.status(400).send({ message: "Se requiere el id_periodo." });
+        }
+
+        const whereCondition = { id_periodo };
+
+        if (docenteId) {
+            whereCondition.docenteId = docenteId;
+        }
+
+        const includeConditions = [
+            {
+                model: CarreraClaseBloque,
+                as: 'ccb',
+                attributes: ['id_ccb', 'facultadId', 'id_bloque'],
+                include: [
+                    {
+                        model: Clase,
+                        attributes: ['id_clase', 'nombre_clase', 'creditos', 'TipoClase'],
+                        ...(id_clase ? { where: { id_clase } } : {})
+                    }
+                ]
+            }
+        ];
+
+        const resultados = await DetallePeriodo.findAll({
+            where: whereCondition,
+            include: includeConditions,
+            order: [['hora_inicio', 'ASC']]
         });
+
+        res.status(200).send(resultados);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: error.message || "Error al obtener las secciones."
+        });
+    }
 }
 
 async function insert(req, res) {
@@ -187,6 +217,48 @@ async function insert(req, res) {
             return res.status(400).json({
                 message: "El docente ya tiene asignada una clase que se superpone en días y horarios con esta asignación"
             });
+        }
+
+        // 6.1 Validar disponibilidad del docente
+        const [horaInicioHoras, horaInicioMinutos] = hora_inicio.split(':').map(Number);
+        const [horaFinalHoras, horaFinalMinutos] = horaFinalGenerada.split(':').map(Number);
+        const minutosInicio = horaInicioHoras * 60 + horaInicioMinutos;
+        const minutosFin = horaFinalHoras * 60 + horaFinalMinutos;
+
+        for (let dia = dia_inicio; dia <= dia_final; dia++) {
+            const disponibilidad = await HorarioDisponibilidad.findAll({
+                where: {
+                    docenteId,
+                    dia
+                }
+            });
+
+            if (!disponibilidad || disponibilidad.length === 0) {
+                const nombreDia = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dia];
+                return res.status(400).json({
+                    message: `El docente no está disponible el ${nombreDia}. Debe configurar su horario de disponibilidad primero.`
+                });
+            }
+
+            let cubierto = false;
+            for (const disp of disponibilidad) {
+                const [dispInicioH, dispInicioM] = disp.franja_inicio.split(':').map(Number);
+                const [dispFinH, dispFinM] = disp.franja_fin.split(':').map(Number);
+                const dispMinutosInicio = dispInicioH * 60 + dispInicioM;
+                const dispMinutosFin = dispFinH * 60 + dispFinM;
+
+                if (dispMinutosInicio <= minutosInicio && dispMinutosFin >= minutosFin) {
+                    cubierto = true;
+                    break;
+                }
+            }
+
+            if (!cubierto) {
+                const nombreDia = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dia];
+                return res.status(400).json({
+                    message: `El docente no está disponible en el horario de ${hora_inicio} a ${horaFinalGenerada} el ${nombreDia}.`
+                });
+            }
         }
 
         // 7. Generación de la sección automáticamente
@@ -411,6 +483,48 @@ async function update(req, res) {
             if (conflictoDocente) {
                 return res.status(400).json({
                     message: "El docente ya tiene asignada una clase que se superpone en días y horarios con esta asignación"
+                });
+            }
+        }
+
+        // 6.1 Validar disponibilidad del docente
+        const [horaInicioHorasUpd, horaInicioMinutosUpd] = hora_inicio.split(':').map(Number);
+        const [horaFinalHorasUpd, horaFinalMinutosUpd] = horaFinalGenerada.split(':').map(Number);
+        const minutosInicioUpd = horaInicioHorasUpd * 60 + horaInicioMinutosUpd;
+        const minutosFinUpd = horaFinalHorasUpd * 60 + horaFinalMinutosUpd;
+
+        for (let dia = dia_inicio; dia <= dia_final; dia++) {
+            const disponibilidad = await HorarioDisponibilidad.findAll({
+                where: {
+                    docenteId,
+                    dia
+                }
+            });
+
+            if (!disponibilidad || disponibilidad.length === 0) {
+                const nombreDia = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dia];
+                return res.status(400).json({
+                    message: `El docente no está disponible el ${nombreDia}. Debe configurar su horario de disponibilidad primero.`
+                });
+            }
+
+            let cubierto = false;
+            for (const disp of disponibilidad) {
+                const [dispInicioH, dispInicioM] = disp.franja_inicio.split(':').map(Number);
+                const [dispFinH, dispFinM] = disp.franja_fin.split(':').map(Number);
+                const dispMinutosInicio = dispInicioH * 60 + dispInicioM;
+                const dispMinutosFin = dispFinH * 60 + dispFinM;
+
+                if (dispMinutosInicio <= minutosInicioUpd && dispMinutosFin >= minutosFinUpd) {
+                    cubierto = true;
+                    break;
+                }
+            }
+
+            if (!cubierto) {
+                const nombreDia = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dia];
+                return res.status(400).json({
+                    message: `El docente no está disponible en el horario de ${hora_inicio} a ${horaFinalGenerada} el ${nombreDia}.`
                 });
             }
         }

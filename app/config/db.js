@@ -7,7 +7,7 @@ const fs = require("fs");
 /*eslint-disable no-undef*/
 const sequelizeInstance = new Sequelize(process.env.DB, process.env.USER, process.env.PASSWORD, {
     host: process.env.HOST,
-    dialect: process.env.DIALECT,
+    dialect: 'mysql',
     port: process.env.MY_SQL_PORT,
     dialectOptions: {
         connectTimeout: 100000
@@ -49,6 +49,7 @@ db.permissions = require("../models/permissionModel")(sequelizeInstance, Sequeli
 db.userPermission = require("../models/userPermissionsModel")(sequelizeInstance, Sequelize);
 db.rolePermission = require("../models/rolePermissionsModel")(sequelizeInstance, Sequelize);
 db.file = require('../models/fileModel')(sequelizeInstance, Sequelize);
+db.horario_disponibilidad = require('../models/horarioDisponibilidadModel')(sequelizeInstance, Sequelize);
 // Relaciones
 
 // Accion >- Plantilla
@@ -168,5 +169,8 @@ db.file.belongsTo(db.users, {
     foreignKey: 'userId',
     targetKey: 'userId'
 });
+
+db.horario_disponibilidad.belongsTo(db.docente, { foreignKey: { name: 'docenteId' } });
+db.docente.hasMany(db.horario_disponibilidad, { foreignKey: 'docenteId', sourceKey: 'docenteId' });
 
 module.exports = db;
