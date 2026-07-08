@@ -12,7 +12,8 @@ module.exports = {
     get,
     insert,
     update,
-    deleteSection
+    deleteSection,
+    updateObservacion
 };
 
 async function get(req, res) {
@@ -63,7 +64,7 @@ async function insert(req, res) {
     try {
         const {
             id_clase, hora_inicio, hora_final, docenteId,
-            dia_inicio, dia_final, horario_especial
+            dia_inicio, dia_final, horario_especial, observacion
         } = req.body;
 
         // 1. Obtener el periodo actual
@@ -229,7 +230,8 @@ async function insert(req, res) {
             const disponibilidad = await HorarioDisponibilidad.findAll({
                 where: {
                     docenteId,
-                    dia
+                    dia,
+                    tipo: 'clase'
                 }
             });
 
@@ -291,7 +293,8 @@ async function insert(req, res) {
                 hora_final: horaFinalGenerada,
                 dia_inicio,
                 dia_final,
-                seccion: seccion
+                seccion: seccion,
+                observacion: observacion || null
             });
             registrosInsertados.push(detalle);
         }
@@ -307,7 +310,7 @@ async function update(req, res) {
     try {
         const {
             id_clase, hora_inicio, hora_final, docenteId,
-            dia_inicio, dia_final, horario_especial, seccion
+            dia_inicio, dia_final, horario_especial, seccion, observacion
         } = req.body;
 
         // Validaciones de parámetros requeridos
@@ -497,7 +500,8 @@ async function update(req, res) {
             const disponibilidad = await HorarioDisponibilidad.findAll({
                 where: {
                     docenteId,
-                    dia
+                    dia,
+                    tipo: 'clase'
                 }
             });
 
@@ -575,6 +579,9 @@ async function update(req, res) {
             detalle.dia_inicio = dia_inicio;
             detalle.dia_final = dia_final;
             detalle.seccion = nuevaSeccion;
+            if (observacion !== undefined) {
+                detalle.observacion = observacion;
+            }
 
             await detalle.save();
             registrosActualizados.push(detalle);
@@ -649,6 +656,38 @@ async function deleteSection(req, res) {
         console.error(error);
         return res.status(500).json({
             message: "Error al procesar la solicitud de eliminación",
+            error
+        });
+    }
+}
+
+async function updateObservacion(req, res) {
+    try {
+        const { id_detalle, observacion } = req.body;
+
+        if (!id_detalle) {
+            return res.status(400).json({ message: "Se requiere id_detalle." });
+        }
+
+        const detalle = await DetallePeriodo.findOne({
+            where: { id_detalle }
+        });
+
+        if (!detalle) {
+            return res.status(404).json({ message: "Registro no encontrado." });
+        }
+
+        detalle.observacion = observacion || null;
+        await detalle.save();
+
+        return res.status(200).json({
+            message: "Observación actualizada exitosamente",
+            registro: detalle
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Error al actualizar la observación",
             error
         });
     }

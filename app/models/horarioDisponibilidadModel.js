@@ -24,6 +24,10 @@ module.exports = (sequelize) => {
         disponible: {
             type: DataTypes.TINYINT,
             defaultValue: 1
+        },
+        tipo: {
+            type: DataTypes.STRING(10),
+            defaultValue: 'clase'
         }
     }
     const options = {

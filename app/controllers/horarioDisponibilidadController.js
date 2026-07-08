@@ -10,7 +10,7 @@ module.exports = {
 };
 
 async function get(req, res) {
-    const { docenteId } = req.query;
+    const { docenteId, tipo } = req.query;
 
     if (!docenteId) {
         return res.status(400).send({
@@ -19,8 +19,13 @@ async function get(req, res) {
     }
 
     try {
+        const whereCondition = { docenteId };
+        if (tipo) {
+            whereCondition.tipo = tipo;
+        }
+
         const registros = await HorarioDisponibilidad.findAll({
-            where: { docenteId }
+            where: whereCondition
         });
 
         res.status(200).send(registros);
@@ -33,7 +38,7 @@ async function get(req, res) {
 }
 
 async function upsert(req, res) {
-    const { docenteId, disponibilidades } = req.body;
+    const { docenteId, disponibilidades, tipo } = req.body;
 
     if (!docenteId || !Array.isArray(disponibilidades)) {
         return res.status(400).send({
@@ -41,9 +46,11 @@ async function upsert(req, res) {
         });
     }
 
+    const tipoReal = tipo || 'clase';
+
     try {
         await HorarioDisponibilidad.destroy({
-            where: { docenteId }
+            where: { docenteId, tipo: tipoReal }
         });
 
         const registros = [];
@@ -54,7 +61,8 @@ async function upsert(req, res) {
                     dia: item.dia,
                     franja_inicio: item.franja_inicio,
                     franja_fin: item.franja_fin,
-                    disponible: 1
+                    disponible: 1,
+                    tipo: tipoReal
                 });
                 registros.push(registro);
             }
@@ -73,7 +81,7 @@ async function upsert(req, res) {
 }
 
 async function deleteAll(req, res) {
-    const { docenteId } = req.query;
+    const { docenteId, tipo } = req.query;
 
     if (!docenteId) {
         return res.status(400).send({
@@ -82,8 +90,13 @@ async function deleteAll(req, res) {
     }
 
     try {
+        const whereCondition = { docenteId };
+        if (tipo) {
+            whereCondition.tipo = tipo;
+        }
+
         const eliminados = await HorarioDisponibilidad.destroy({
-            where: { docenteId }
+            where: whereCondition
         });
 
         res.status(200).send({
