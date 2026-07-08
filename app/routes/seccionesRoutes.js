@@ -8,6 +8,7 @@ const apiRoutes = express.Router();
 apiRoutes.get('/getSections', auth.isAuth, async (req, res) => await seccionesController.get(req, res))
         .post('/insertSection', auth.isAuth, async (req, res) => await seccionesController.insert(req, res))
         .put('/updateSection', auth.isAuth, async (req, res) => await seccionesController.update(req, res))
+        .patch('/updateObservacion', auth.isAuth, async (req, res) => await seccionesController.updateObservacion(req, res))
         .delete('/deleteSection', auth.isAuth, async (req, res) => await seccionesController.deleteSection(req, res));
 
 module.exports = apiRoutes;
