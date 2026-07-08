@@ -77,10 +77,30 @@ async function updateTerna(req, res) {
     }
 
 }
+async function cancelarTerna(req, res) {
+    try {
+        const { idTerna } = req.body;
+        const terna = await Terna.findByPk(idTerna);
+
+        if (!terna) {
+            return res.status(404).send({ message: 'Terna no encontrada' });
+        }
+
+        await terna.update({
+            idEstadoTerna: 3, 
+        });
+
+        return res.status(200).send({ message: 'Terna cancelada correctamente' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: 'Error al cancelar la terna' });
+    }
+}
 
 module.exports = {
     findAll,
     findBy,
     insert,
     updateTerna,
+    cancelarTerna,
 }
