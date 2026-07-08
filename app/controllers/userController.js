@@ -15,6 +15,7 @@ module.exports = {
 
 async function signUp(req, res) {
     let newPass = undefined;
+    console.log(req.body);
     await bcrypt.genSalt(10).then(async salts => {
         await bcrypt.hash(req.body['pass'], salts).then(hash => {
             newPass = hash;

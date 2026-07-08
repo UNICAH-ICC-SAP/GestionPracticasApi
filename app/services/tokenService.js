@@ -6,7 +6,7 @@ const moment = require('moment');
 function createToken(user) {
     const payload = {
         sub: user,
-        iat: moment().unix,
+        iat: moment().unix(),
         exp: moment().add(15, 'days').unix()
     }
     /*eslint-disable no-undef*/

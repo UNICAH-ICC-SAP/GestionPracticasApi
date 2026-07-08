@@ -31,8 +31,9 @@ const plantillaAccionRoutes = require('./routes/plantillaAccionRoutes');
 const userPermissionRoutes = require('./routes/userPermissionRoutes')
 const rolePermissionRoutes = require('./routes/rolePermissionsRoutes')
 const fileRoutes = require('./routes/fileRoutes');
+const reporteRoutes = require('./routes/reportesRoutes');
 
-
+App.use('/api/reportes', reporteRoutes);
 //TODO: Put every route file here. App.use('api/test', test);
 App.use('/api/role', roleRoutes);
 App.use('/api/user', usuarioRoutes);
