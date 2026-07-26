@@ -132,12 +132,6 @@ async function getMonografiaCompleta(req, res) {
             5: 'Finalizada'
         };
 
-        const RolMap = {
-            'coordina': 'Coordinador',
-            'estilo': 'Revisor de Estilos',
-            'tecnico': 'Revisor Tecnico'
-        };
-
         const ternaData = terna.toJSON();
 
         const docentes = (ternaData.detalleTernas || []).map(dt => ({
@@ -145,7 +139,7 @@ async function getMonografiaCompleta(req, res) {
             nombre: dt.docente ? dt.docente.nombre : 'Sin nombre',
             email: dt.docente ? dt.docente.email : '',
             telefono: dt.docente ? dt.docente.telefono : '',
-            rol: RolMap[dt.rol] || dt.rol
+            rol: dt.rol
         }));
 
         const response = {
