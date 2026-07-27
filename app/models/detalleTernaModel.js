@@ -15,16 +15,8 @@ module.exports = (sequelize) => {
         docenteId: {
             type: DataTypes.STRING(13)
         },
-        coordina: {
-            type: DataTypes.BOOLEAN
-        },
         rol: {
-            type: DataTypes.VIRTUAL,
-            get() {
-                const val = this.getDataValue('coordina');
-                if (val === null || val === undefined) return '';
-                return val ? 'coordina' : 'miembro';
-            }
+            type: DataTypes.STRING(9)
         }
     }
     const options = {
