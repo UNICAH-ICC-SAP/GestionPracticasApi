@@ -34,9 +34,9 @@ module.exports = (sequelize) => {
         defaultScope: {
             attributes: { exclude: ['createdAt', 'updatedAt'] }
         },
-        tableName: 'horario_disponibilidad_docente',
+        tableName: 'Calendario_disponibilidad_docente',
         timestamps: false
     }
 
-    return sequelize.define('horario_disponibilidad_docente', attributes, options);
+    return sequelize.define('Calendario_disponibilidad_docente', attributes, options);
 }
