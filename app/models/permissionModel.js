@@ -28,7 +28,7 @@ module.exports = (sequelize) => {
             //TODO: Includes attributes for scopes here
         },
         tableName: 'permissions',
-        timestamps: 'false'
+        timestamps: false
     }
 
     return sequelize.define('permissions', attributes, options);
