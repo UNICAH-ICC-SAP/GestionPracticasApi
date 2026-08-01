@@ -50,6 +50,7 @@ db.userPermission = require("../models/userPermissionsModel")(sequelizeInstance,
 db.rolePermission = require("../models/rolePermissionsModel")(sequelizeInstance, Sequelize);
 db.file = require('../models/fileModel')(sequelizeInstance, Sequelize);
 db.horario_disponibilidad = require('../models/horarioDisponibilidadModel')(sequelizeInstance, Sequelize);
+db.comentario = require('../models/comentarioModel')(sequelizeInstance, Sequelize);
 // Relaciones
 
 // Accion >- Plantilla
