@@ -1,4 +1,3 @@
-/*eslint-env node*/
 'use strict'
 
 
@@ -50,6 +49,8 @@ db.permissions = require("../models/permissionModel")(sequelizeInstance, Sequeli
 db.userPermission = require("../models/userPermissionsModel")(sequelizeInstance, Sequelize);
 db.rolePermission = require("../models/rolePermissionsModel")(sequelizeInstance, Sequelize);
 db.file = require('../models/fileModel')(sequelizeInstance, Sequelize);
+db.horario_disponibilidad = require('../models/horarioDisponibilidadModel')(sequelizeInstance, Sequelize);
+db.comentario = require('../models/comentarioModel')(sequelizeInstance, Sequelize);
 
 // Relaciones
 db.accionCorreo.belongsTo(db.plantilla_correo, { foreignKey: { name: 'plantillaCorreoId' } });
@@ -130,5 +131,8 @@ db.file.belongsTo(db.users, {
     foreignKey: 'userId',
     targetKey: 'userId'
 });
+
+db.horario_disponibilidad.belongsTo(db.docente, { foreignKey: { name: 'docenteId' } });
+db.docente.hasMany(db.horario_disponibilidad, { foreignKey: 'docenteId', sourceKey: 'docenteId' });
 
 module.exports = db;

@@ -33,6 +33,9 @@ module.exports = (sequelize) => {
         hora_final: {
             type: DataTypes.TIME
         },
+        observacion: {
+            type: DataTypes.TEXT
+        },
     }
     const options = {
         defaultScope: {

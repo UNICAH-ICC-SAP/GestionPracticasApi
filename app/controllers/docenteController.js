@@ -34,10 +34,18 @@ async function insert(req, res) {
 }
 
 async function findAll(req, res) {
-    Docente.findAll({
+    const facultadId = req.query.facultadId || req.query.facultad;
+
+    const queryOptions = {
         where: { estadoDocente: 1 },
         include: [{ model: Facultad }]
-    })
+    };
+
+    if (facultadId) {
+        queryOptions.where.facultadId = facultadId;
+    }
+
+    Docente.findAll(queryOptions)
         .then(data => {
             res.status(200).send(data);
         })
@@ -47,7 +55,6 @@ async function findAll(req, res) {
             });
         });
 }
-
 async function findBy(req, res) {
     Docente.findAll({
         where: req.query,

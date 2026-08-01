@@ -32,8 +32,9 @@ const userPermissionRoutes = require('./routes/userPermissionRoutes')
 const rolePermissionRoutes = require('./routes/rolePermissionsRoutes')
 const fileRoutes = require('./routes/fileRoutes');
 const reporteRoutes = require('./routes/reportesRoutes');
+const horarioDisponibilidadRoutes = require('./routes/horarioDisponibilidadRoutes');
+const comentarioRoutes = require('./routes/comentarioRoutes');
 
-App.use('/api/reportes', reporteRoutes);
 //TODO: Put every route file here. App.use('api/test', test);
 App.use('/api/role', roleRoutes);
 App.use('/api/user', usuarioRoutes);
@@ -51,5 +52,8 @@ App.use('/api/correo', correoRoutes);
 App.use('/api/userPermission', userPermissionRoutes);
 App.use('/api/rolePermission', rolePermissionRoutes);
 App.use('/api/files', fileRoutes);
+App.use('/api/reportes', reporteRoutes);
+App.use('/api/horario', horarioDisponibilidadRoutes);
+App.use('/api/comentario', comentarioRoutes);
 
 module.exports = App;

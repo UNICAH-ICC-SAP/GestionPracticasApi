@@ -15,9 +15,21 @@ module.exports = {
 
 async function get(req, res) {
     const tipoClase = req.query.TipoClase;
-    Pensum.findAll({
+    const facultadId = req.query.facultadId;
+
+    const queryOptions = {
         where: { TipoClase: tipoClase, estado: 1 }
-    })
+    };
+
+    if (facultadId) {
+        queryOptions.include = [{
+            model: CarreraClaseBloque,
+            where: { facultadId: facultadId },
+            attributes: []
+        }];
+    }
+
+    Pensum.findAll(queryOptions)
         .then(data => {
             res.status(200).send(data);
         })
