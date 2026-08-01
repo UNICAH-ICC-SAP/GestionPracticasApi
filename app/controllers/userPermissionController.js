@@ -3,6 +3,8 @@
 const db = require('../config/db');
 const UserPermission = db.userPermission;
 const Permission = db.permissions;
+const RolePermission = db.rolePermission;
+const User = db.users;
 
 async function insert(req, res) {
     const body = req.body;
@@ -37,6 +39,7 @@ async function findAll(req, res) {
         });
 }
 
+// Combina permisos directos del usuario + permisos heredados de su rol
 async function findPermissionsByUser(req, res) {
     try {
         const { userId } = req.body;
@@ -47,7 +50,17 @@ async function findPermissionsByUser(req, res) {
             });
         }
 
-        const data = await UserPermission.findAll({
+        // 1. Obtener el usuario para saber su rol
+        const user = await User.findByPk(userId);
+
+        if (!user) {
+            return res.status(404).send({
+                message: "Usuario no encontrado"
+            });
+        }
+
+        // 2. Permisos directos del usuario (tabla user_permissions)
+        const userPerms = await UserPermission.findAll({
             where: { userId },
             include: [{
                 model: Permission,
@@ -55,14 +68,46 @@ async function findPermissionsByUser(req, res) {
             }]
         });
 
+        // 3. Permisos heredados del rol (tabla role_permissions)
+        const rolePerms = await RolePermission.findAll({
+            where: { roleId: user.roleId },
+            include: [{
+                model: Permission,
+                attributes: ['permissionId', 'name', 'description']
+            }]
+        });
+
+        // 4. Normalizar ambos arreglos a un mismo formato
+        const fromRole = rolePerms.map(item => ({
+            permissionId: item.permission.permissionId,
+            permission: item.permission.name,
+            description: item.permission.description,
+            type: 'ALLOW', // role_permissions no maneja DENY, se asume ALLOW
+            source: 'role'
+        }));
+
+        const fromUser = userPerms.map(item => ({
+            permissionId: item.permission.permissionId,
+            permission: item.permission.name,
+            description: item.permission.description,
+            type: item.type, // 'ALLOW' | 'DENY'
+            source: 'user'
+        }));
+
+        // 5. Combinar: el permiso explícito del usuario tiene prioridad sobre el del rol
+        const combined = [...fromRole, ...fromUser].reduce((acc, curr) => {
+            const existing = acc.find(p => p.permissionId === curr.permissionId);
+            if (!existing) {
+                acc.push(curr);
+            } else if (curr.source === 'user') {
+                Object.assign(existing, curr);
+            }
+            return acc;
+        }, []);
+
         const result = {
             userId,
-            permissions: data.map(item => ({
-                permissionId: item.permission.permissionId,
-                permission: item.permission.name,
-                description: item.permission.description,
-                type: item.type
-            }))
+            permissions: combined
         };
 
         return res.status(200).send(result);

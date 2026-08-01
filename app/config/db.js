@@ -1,4 +1,6 @@
+/*eslint-env node*/
 'use strict'
+
 
 const Sequelize = require("sequelize");
 require('dotenv').config();
