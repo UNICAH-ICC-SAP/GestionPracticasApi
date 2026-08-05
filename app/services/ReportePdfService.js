@@ -86,6 +86,11 @@ function dibujarPiePaginaYMarco(doc) {
         dibujarMarco(doc);
 
         const { width, height, margins } = doc.page;
+        // El texto va por debajo del margen inferior (es el pie de página), así que
+        // se anula temporalmente el margen: si no, pdfkit cree que no cabe y agrega
+        // una página en blanco extra por cada página del documento.
+        const margenInferiorOriginal = margins.bottom;
+        doc.page.margins.bottom = 0;
         doc.fontSize(8)
             .font('Helvetica')
             .fillColor(GRIS_TEXTO)
@@ -93,6 +98,7 @@ function dibujarPiePaginaYMarco(doc) {
                 width: width - margins.left - margins.right,
                 align: 'center',
             });
+        doc.page.margins.bottom = margenInferiorOriginal;
     }
 }
 
@@ -177,28 +183,40 @@ function generarPDFDocentes(docentes) {
         doc.font('Helvetica-Oblique').fontSize(10).text('No hay docentes activos registrados.');
     } else {
         docentes.forEach((docente, idx) => {
-            asegurarEspacio(doc, 60);
+            const sinDatos = docente.carga.length === 0 && docente.ternasDetalle.length === 0;
+            asegurarEspacio(doc, sinDatos ? 40 : 60);
 
             doc.font('Helvetica-Bold').fontSize(12).fillColor(AZUL)
                 .text(docente.nombre || 'N/D');
             doc.font('Helvetica').fontSize(9).fillColor(GRIS_TEXTO)
                 .text(`Facultad: ${docente.facultad || 'N/D'}    Email: ${docente.email || 'N/D'}    Teléfono: ${docente.telefono || 'N/D'}`);
-            doc.moveDown(0.4);
 
-            dibujarTitulo(doc, 'Carga académica');
-            dibujarTabla(doc, [
-                { key: 'clase', label: 'Clase', width: 160 },
-                { key: 'seccion', label: 'Sección', width: 70 },
-                { key: 'dias', label: 'Días', width: 140 },
-                { key: 'horario', label: 'Horario', width: 142 },
-            ], docente.carga);
+            if (sinDatos) {
+                doc.font('Helvetica-Oblique').fontSize(9).fillColor(GRIS_TEXTO)
+                    .text('Sin carga académica ni ternas asignadas este periodo.');
+                doc.moveDown(0.4);
+            } else {
+                doc.moveDown(0.4);
 
-            dibujarTitulo(doc, 'Ternas asignadas');
-            dibujarTabla(doc, [
-                { key: 'alumno', label: 'Alumno', width: 220 },
-                { key: 'rol', label: 'Rol', width: 140 },
-                { key: 'estado', label: 'Estado', width: 152 },
-            ], docente.ternasDetalle);
+                if (docente.carga.length > 0) {
+                    dibujarTitulo(doc, 'Carga académica');
+                    dibujarTabla(doc, [
+                        { key: 'clase', label: 'Clase', width: 160 },
+                        { key: 'seccion', label: 'Sección', width: 70 },
+                        { key: 'dias', label: 'Días', width: 140 },
+                        { key: 'horario', label: 'Horario', width: 142 },
+                    ], docente.carga);
+                }
+
+                if (docente.ternasDetalle.length > 0) {
+                    dibujarTitulo(doc, 'Ternas asignadas');
+                    dibujarTabla(doc, [
+                        { key: 'alumno', label: 'Alumno', width: 220 },
+                        { key: 'rol', label: 'Rol', width: 140 },
+                        { key: 'estado', label: 'Estado', width: 152 },
+                    ], docente.ternasDetalle);
+                }
+            }
 
             if (idx < docentes.length - 1) {
                 dibujarSeparador(doc);
