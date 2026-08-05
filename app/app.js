@@ -34,6 +34,8 @@ const fileRoutes = require('./routes/fileRoutes');
 const reporteRoutes = require('./routes/reportesRoutes');
 const horarioDisponibilidadRoutes = require('./routes/horarioDisponibilidadRoutes');
 const comentarioRoutes = require('./routes/comentarioRoutes');
+const reportesRoutes = require('./routes/reportesRoutes');
+
 
 //TODO: Put every route file here. App.use('api/test', test);
 App.use('/api/role', roleRoutes);
@@ -55,5 +57,6 @@ App.use('/api/files', fileRoutes);
 App.use('/api/reportes', reporteRoutes);
 App.use('/api/horario', horarioDisponibilidadRoutes);
 App.use('/api/comentario', comentarioRoutes);
+App.use('/api/reportes', reportesRoutes);
 
 module.exports = App;

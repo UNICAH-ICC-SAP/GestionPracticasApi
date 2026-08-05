@@ -1,9 +1,12 @@
 'use strict'
 
 const express = require('express');
-const router = express.Router();
 const reportesController = require('../controllers/reportesController');
+const auth = require('../middlewares/auth')
+const apiRoutes = express.Router();
 
-router.get('/resumen', reportesController.getResumen);
+apiRoutes.get('/docentes', auth.isAuth, async (req, res) => await reportesController.generarReporteDocentes(req, res))
+    .get('/ternas', auth.isAuth, async (req, res) => await reportesController.generarReporteTernas(req, res))
+    .get('/clases', auth.isAuth, async (req, res) => await reportesController.generarReporteClases(req, res));
 
-module.exports = router;
+module.exports = apiRoutes;
