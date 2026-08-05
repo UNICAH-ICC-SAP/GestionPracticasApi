@@ -3,7 +3,6 @@
 const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 
-/*eslint-disable no-undef*/
 const storage = new Storage({
     projectId: process.env.GCP_PROJECT_ID,
     credentials: {
@@ -13,7 +12,6 @@ const storage = new Storage({
 });
 
 const bucketName = process.env.GCP_BUCKET_NAME;
-/*eslint-enable no-undef*/
 
 const ALLOWED_MIME_TYPES = [
     'application/pdf',

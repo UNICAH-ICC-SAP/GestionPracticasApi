@@ -4,10 +4,7 @@ const db = require('./app/config/db');
 const App = require('./app/app');
 require('dotenv').config()
 
-/*eslint-disable no-undef*/
 const PORT = process.env.PORT || process.env.APP_PORT;
-/*eslint-enable no-undef*/
-console.log(db);
 
 db.sequelize.sync()
     .then(() => {

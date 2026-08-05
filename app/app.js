@@ -54,6 +54,6 @@ App.use('/api/rolePermission', rolePermissionRoutes);
 App.use('/api/files', fileRoutes);
 App.use('/api/reportes', reporteRoutes);
 App.use('/api/horario', horarioDisponibilidadRoutes);
-App.use('/api/comentario', comentarioRoutes);
+App.use('/api/comentarios', comentarioRoutes);
 
 module.exports = App;
