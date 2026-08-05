@@ -226,6 +226,8 @@ async function insert(req, res) {
         const minutosInicio = horaInicioHoras * 60 + horaInicioMinutos;
         const minutosFin = horaFinalHoras * 60 + horaFinalMinutos;
 
+        let advertenciaDisponibilidad = null;
+
         for (let dia = dia_inicio; dia <= dia_final; dia++) {
             const disponibilidad = await HorarioDisponibilidad.findAll({
                 where: {
@@ -236,10 +238,8 @@ async function insert(req, res) {
             });
 
             if (!disponibilidad || disponibilidad.length === 0) {
-                const nombreDia = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dia];
-                return res.status(400).json({
-                    message: `El docente no está disponible el ${nombreDia}. Debe configurar su horario de disponibilidad primero.`
-                });
+                advertenciaDisponibilidad = "Uno de los días que marcó, a esta hora el docente no está disponible. Comuníquese con el docente para verificar el error.";
+                break;
             }
 
             let cubierto = false;
@@ -256,10 +256,8 @@ async function insert(req, res) {
             }
 
             if (!cubierto) {
-                const nombreDia = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dia];
-                return res.status(400).json({
-                    message: `El docente no está disponible en el horario de ${hora_inicio} a ${horaFinalGenerada} el ${nombreDia}.`
-                });
+                advertenciaDisponibilidad = "Uno de los días que marcó, a esta hora el docente no está disponible. Comuníquese con el docente para verificar el error.";
+                break;
             }
         }
 
@@ -299,7 +297,11 @@ async function insert(req, res) {
             registrosInsertados.push(detalle);
         }
 
-        return res.status(201).json({ message: "Registros creados exitosamente", registros: registrosInsertados });
+        return res.status(201).json({
+            message: "Registros creados exitosamente",
+            registros: registrosInsertados,
+            ...(advertenciaDisponibilidad ? { warning: advertenciaDisponibilidad } : {})
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Error al procesar la solicitud", error });
@@ -496,6 +498,8 @@ async function update(req, res) {
         const minutosInicioUpd = horaInicioHorasUpd * 60 + horaInicioMinutosUpd;
         const minutosFinUpd = horaFinalHorasUpd * 60 + horaFinalMinutosUpd;
 
+        let advertenciaDisponibilidadUpd = null;
+
         for (let dia = dia_inicio; dia <= dia_final; dia++) {
             const disponibilidad = await HorarioDisponibilidad.findAll({
                 where: {
@@ -506,10 +510,8 @@ async function update(req, res) {
             });
 
             if (!disponibilidad || disponibilidad.length === 0) {
-                const nombreDia = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dia];
-                return res.status(400).json({
-                    message: `El docente no está disponible el ${nombreDia}. Debe configurar su horario de disponibilidad primero.`
-                });
+                advertenciaDisponibilidadUpd = "Uno de los días que marcó, a esta hora el docente no está disponible. Comuníquese con el docente para verificar el error.";
+                break;
             }
 
             let cubierto = false;
@@ -526,10 +528,8 @@ async function update(req, res) {
             }
 
             if (!cubierto) {
-                const nombreDia = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dia];
-                return res.status(400).json({
-                    message: `El docente no está disponible en el horario de ${hora_inicio} a ${horaFinalGenerada} el ${nombreDia}.`
-                });
+                advertenciaDisponibilidadUpd = "Uno de los días que marcó, a esta hora el docente no está disponible. Comuníquese con el docente para verificar el error.";
+                break;
             }
         }
 
@@ -589,7 +589,8 @@ async function update(req, res) {
 
         return res.status(200).json({
             message: "Registros actualizados exitosamente",
-            registros: registrosActualizados
+            registros: registrosActualizados,
+            ...(advertenciaDisponibilidadUpd ? { warning: advertenciaDisponibilidadUpd } : {})
         });
 
     } catch (error) {

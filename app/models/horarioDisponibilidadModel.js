@@ -15,6 +15,10 @@ module.exports = (sequelize) => {
         dia: {
             type: DataTypes.INTEGER
         },
+        fecha: {
+            type: DataTypes.DATEONLY,
+            allowNull: true
+        },
         franja_inicio: {
             type: DataTypes.TIME
         },

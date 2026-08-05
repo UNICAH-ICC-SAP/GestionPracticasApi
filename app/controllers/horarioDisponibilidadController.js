@@ -59,6 +59,7 @@ async function upsert(req, res) {
                 const registro = await HorarioDisponibilidad.create({
                     docenteId,
                     dia: item.dia,
+                    fecha: item.fecha || null,
                     franja_inicio: item.franja_inicio,
                     franja_fin: item.franja_fin,
                     disponible: 1,
