@@ -7,6 +7,7 @@ const Alumno = db.alumno;
 const Docente = db.docente;
 const File = db.file;
 const { isEmpty } = require('lodash')
+const { isAdmin, canAccessStudent } = require('../services/accessService');
 
 async function insert(req, res) {
     const terna = req.body;
@@ -14,7 +15,7 @@ async function insert(req, res) {
         alumnoId: terna.alumnoId,
         idEstadoTerna: 2,
     }).then(data => {
-        res.status(200).send({ ...data['dataValues'], ternaId: data['null'] });
+        res.status(200).send(data);
     }).catch(error => {
         console.error(error)
         res.status(500).send({
@@ -24,7 +25,7 @@ async function insert(req, res) {
 }
 
 async function findAll(req, res) {
-    Terna.findAll()
+    Terna.findAll({ where: req.accessScope })
         .then(data => {
             res.status(200).send(data);
         })
@@ -36,7 +37,7 @@ async function findAll(req, res) {
 };
 
 async function findBy(req, res) {
-    Terna.findAll({ where: req.query, include: [{ model: DetalleTerna }, { model: Alumno }] })
+    Terna.findAll({ where: { ...req.query, ...req.accessScope }, include: [{ model: DetalleTerna }, { model: Alumno }] })
         .then(data => {
             if (isEmpty(data)) res.status(201).send({ message: 'No Data' })
             else {
@@ -61,8 +62,16 @@ async function updateTerna(req, res) {
             });
         }
 
+        if ((!isAdmin(req.user) && Number(req.user.roleId) !== 2) ||
+            !await canAccessStudent(req.user, terna.alumnoId)) {
+            return res.status(403).send({ message: 'No tienes permiso para modificar esta terna.' });
+        }
+        if (![1, 2, 3, 4, 5].includes(Number(estadoTerna))) {
+            return res.status(400).send({ message: 'El estado de la terna no es válido.' });
+        }
+
         await terna.update({
-            idEstadoTerna: estadoTerna,
+            idEstadoTerna: Number(estadoTerna),
         });
 
         return res.status(200).send({

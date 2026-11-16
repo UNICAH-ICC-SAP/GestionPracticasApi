@@ -9,6 +9,9 @@ module.exports = {
 
 async function findAll(req, res) {
     const { docenteId, id_periodo } = req.query;
+    if (Number(req.user.roleId) !== 1 && String(docenteId) !== String(req.user.userId)) {
+        return res.status(403).send({ message: 'Solo puedes consultar tu propia carga académica.' });
+    }
 
     if (!docenteId || !id_periodo) {
         return res.status(400).send({

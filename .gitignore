@@ -25,3 +25,6 @@ dist-ssr
 *.env
 *.env.*
 .env
+
+# Credenciales locales de cuentas de servicio
+gestion-academica-*.json

@@ -1,3 +1,5 @@
+Consulta los [controles de seguridad, contratos de cuentas y pasos de puesta en marcha](./SECURITY.md).
+
 ## Las reglas convencionales para commits son las siguientes:
 
 - chore: Cambios en tareas, configuración, y otros aspectos relacionados con el mantenimiento del proyecto.

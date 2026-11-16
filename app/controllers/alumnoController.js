@@ -37,7 +37,7 @@ async function insert(req, res) {
 
 async function findAll(req, res) {
     Alumno.findAll({
-        where: { estadoAlumno: 1 },
+        where: { estadoAlumno: 1, ...req.accessScope },
         include: [{ model: Facultad }]
     })
         .then(data => {
@@ -52,7 +52,7 @@ async function findAll(req, res) {
 };
 
 async function findAllData(req, res) {
-    Alumno.findAll({ where: req.query, include: [{ model: facultad }] }).then(
+    Alumno.findAll({ where: { ...req.query, ...req.accessScope }, include: [{ model: facultad }] }).then(
         data => {
             res.status(200).send(data)
         }
@@ -64,7 +64,7 @@ async function findAllData(req, res) {
 }
 
 async function findBy(req, res) {
-    Alumno.findAll({ where: req.query, include: [{ model: Facultad }] })
+    Alumno.findAll({ where: { ...req.query, ...req.accessScope }, include: [{ model: Facultad }] })
 
         .then(data => {
             const newData = {

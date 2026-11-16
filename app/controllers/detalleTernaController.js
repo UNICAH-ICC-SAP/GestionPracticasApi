@@ -34,6 +34,7 @@ async function insert(req, res) {
 async function findAll(req, res) {
     try {
         const data = await DetalleTerna.findAll({
+            where: req.accessScope,
             include: [{ model: Docente }, {model: Terna}]
         });
         res.status(200).send(data);
@@ -48,7 +49,7 @@ async function findAll(req, res) {
 async function findBy(req, res) {
     try {
         const data = await DetalleTerna.findAll({
-            where: req.query
+            where: { ...req.query, ...req.accessScope }
         });
         res.status(200).send(data);
     } catch (error) {

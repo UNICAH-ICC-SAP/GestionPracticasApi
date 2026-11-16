@@ -7,6 +7,7 @@ module.exports = (sequelize) => {
         ternaId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
+            autoIncrement: true,
         },
         alumnoId: {
             type: DataTypes.STRING(13)

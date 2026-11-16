@@ -20,14 +20,13 @@ module.exports = {
 async function findAll(req, res) {
     try {
         const templates = await Plantilla_Correo.findAll({
-            attributes: ['Id_correo', 'correo_origen', 'correo_password', 'asunto', 'cuerpo', 'estado'],
+            attributes: ['Id_correo', 'correo_origen', 'asunto', 'cuerpo', 'estado'],
             where: { estado: true }
         });
         res.status(200).json(templates);
-    } catch (error) {
+    } catch {
         res.status(500).json({
-            message: 'Error al obtener plantillas',
-            error: error.message
+            message: 'Error al obtener plantillas'
         });
     }
 }
@@ -41,7 +40,7 @@ async function findBy(req, res) {
         }
 
         const template = await Plantilla_Correo.findByPk(id, {
-            attributes: ['Id_correo', 'correo_origen', 'correo_password', 'asunto', 'cuerpo', 'estado']
+            attributes: ['Id_correo', 'correo_origen', 'asunto', 'cuerpo', 'estado']
         });
 
         if (!template) {
@@ -49,8 +48,8 @@ async function findBy(req, res) {
         }
 
         res.json(template);
-    } catch (error) {
-        res.status(500).json({ message: 'Error al obtener detalles de la plantilla', error: error.message });
+    } catch {
+        res.status(500).json({ message: 'Error al obtener detalles de la plantilla' });
     }
 }
 
@@ -71,10 +70,9 @@ async function insert(req, res) {
             message: 'Plantilla creada exitosamente',
             templateId: nuevaPlantilla.Id_correo // Retorna el ID de la nueva plantilla creada
         });
-    } catch (error) {
+    } catch {
         res.status(500).json({
-            message: 'Error al crear plantilla',
-            error: error.message
+            message: 'Error al crear plantilla'
         });
     }
 }
@@ -93,13 +91,13 @@ async function update(req, res) {
 
     try {
         const [updated] = await Plantilla_Correo.update(
-            { correo_origen, correo_password, asunto, cuerpo },
+            { correo_origen, asunto, cuerpo, ...(correo_password ? { correo_password } : {}) },
             { where: { Id_correo: correoId } }
         );
 
         if (updated) {
             const updated = await Plantilla_Correo.findByPk(correoId, {
-                attributes: ['Id_correo', 'correo_origen', 'correo_password', 'asunto', 'cuerpo']
+                attributes: ['Id_correo', 'correo_origen', 'asunto', 'cuerpo']
             });
             res.json({
                 message: 'Plantilla actualizada exitosamente',
@@ -108,10 +106,9 @@ async function update(req, res) {
         } else {
             res.status(404).json({ message: 'Plantilla no encontrada' });
         }
-    } catch (error) {
+    } catch {
         res.status(500).json({
-            message: 'Error al actualizar la plantilla',
-            error: error.message
+            message: 'Error al actualizar la plantilla'
         });
     }
 }
@@ -138,72 +135,53 @@ async function updateStatus(req, res) {
         } else {
             res.status(404).send({ message: 'Plantilla no encontrada.' });
         }
-    } catch (error) {
-        res.status(500).send({ message: error.message });
+    } catch {
+        res.status(500).send({ message: 'No se pudo actualizar el estado de la plantilla.' });
     }
 }
 
 // API para enviar el correo con la plantilla
 async function enviarCorreo(req, res) {
     const { accion } = req.params;
-    console.log(accion)
     const { correoDestino } = req.body;
-    if (!accion) {
-        return res.status(400).json({
-            message: 'Faltan datos requeridos',
-        });
+    if (!accion || typeof correoDestino !== 'string' || !correoDestino.trim()) {
+        return res.status(400).json({ message: 'La acción y el correo de destino son requeridos.' });
     }
 
-    // try {
-    //     const plantillaCorreo = await Plantilla_Correo.findOne({
-    //         where: { Id_correo: parseInt(correoId, 10), estado: 1 }
-    //     });
-
-    const accionPlantillaResponse = await AccionesPlantillaCorreo.findOne({
-        where: { accion: accion },
-        include: [
-            {
-                model: Plantilla_Correo,
-            }
-        ]
-    });
-    const accionPlantilla = accionPlantillaResponse.plantilla_correo.get({ plain: true });
-    console.log(accionPlantilla)
-    if (!accionPlantilla) {
-        return res.status(404).send({ message: 'Plantilla no encontrada o inactiva.' });
-    }
-    let cuerpoPersonalizado = accionPlantilla.cuerpo;
-
-    const entries = Object.entries(req.body);
-    console.log(entries)
-    entries.forEach(item => {
-        cuerpoPersonalizado = cuerpoPersonalizado.replace(`{{${item[0]}}}`, he.encode(item[1]))
-        console.log(item[0])
-    });
-
-
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: true, // upgrade later with STARTTLS
-        auth: {
-            user: accionPlantilla.correo_origen,
-            pass: accionPlantilla.correo_password,
-        },
-    });
-    const mailOptions = {
-        from: `Unidad Acádemica SAP ${he.encode(accionPlantilla.correo_origen)}`,
-        to: he.encode(correoDestino),
-        subject: he.encode(accionPlantilla.asunto),
-        html: cuerpoPersonalizado
-    };
-
-    await transporter.sendMail(mailOptions)
-        .then(result => {
-            res.status(200).send({ message: 'Correo enviado exitosamente', detalles: result });
-            transporter.close();
-        }).catch(error => {
-            res.status(500).send({ message: 'Error al enviar correo', error: error.message });
+    let transporter;
+    try {
+        const response = await AccionesPlantillaCorreo.findOne({
+            where: { accion },
+            include: [{ model: Plantilla_Correo }]
         });
+        if (!response || !response.plantilla_correo) {
+            return res.status(404).send({ message: 'Plantilla no encontrada o inactiva.' });
+        }
+        const template = response.plantilla_correo.get({ plain: true });
+        if (!template.estado) return res.status(404).send({ message: 'Plantilla no encontrada o inactiva.' });
+
+        let cuerpo = template.cuerpo;
+        Object.entries(req.body).forEach(([key, value]) => {
+            cuerpo = cuerpo.split(`{{${key}}}`).join(he.encode(String(value)));
+        });
+        transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            requireTLS: true,
+            auth: { user: template.correo_origen, pass: template.correo_password }
+        });
+        await transporter.sendMail({
+            from: template.correo_origen,
+            to: correoDestino,
+            subject: template.asunto,
+            html: cuerpo
+        });
+        return res.status(200).send({ message: 'Correo enviado exitosamente.' });
+    } catch {
+        return res.status(500).send({ message: 'No se pudo enviar el correo.' });
+    } finally {
+        if (transporter) transporter.close();
+    }
 }

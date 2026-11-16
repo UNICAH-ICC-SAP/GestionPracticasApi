@@ -37,7 +37,7 @@ async function findAll(req, res) {
     const facultadId = req.query.facultadId || req.query.facultad;
 
     const queryOptions = {
-        where: { estadoDocente: 1 },
+        where: { estadoDocente: 1, ...req.accessScope },
         include: [{ model: Facultad }]
     };
 
@@ -57,7 +57,7 @@ async function findAll(req, res) {
 }
 async function findBy(req, res) {
     Docente.findAll({
-        where: req.query,
+        where: { ...req.query, ...req.accessScope },
         include: [{ model: Facultad }]
     })
         .then(data => {

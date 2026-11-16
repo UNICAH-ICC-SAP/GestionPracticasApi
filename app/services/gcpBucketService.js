@@ -2,6 +2,7 @@
 
 const { Storage } = require('@google-cloud/storage');
 const path = require('path');
+const crypto = require('crypto');
 
 const storage = new Storage({
     projectId: process.env.GCP_PROJECT_ID,
@@ -50,7 +51,8 @@ function buildUserFolder(userId, userName) {
 }
 
 function validateFile(file) {
-    if (!file.fileName || !file.contentType || !file.size) {
+    if (!file || typeof file.fileName !== 'string' || !file.fileName.trim() ||
+        !Number.isSafeInteger(Number(file.size)) || Number(file.size) <= 0) {
         throw new Error('fileName, contentType y size son obligatorios');
     }
 
@@ -59,7 +61,7 @@ function validateFile(file) {
     }
 
     if (Number(file.size) > MAX_FILE_SIZE) {
-        throw new Error(`El archivo ${file.fileName} supera los 10 MB`);
+        throw new Error(`El archivo ${file.fileName} supera los 50 MB`);
     }
 }
 
@@ -71,7 +73,7 @@ async function generateSignedUrlByUser(params) {
     const userFolder = buildUserFolder(userId, userName);
     const safeFileName = sanitizeFileName(file.fileName);
 
-    const storedName = `Gestion_Practicas/${userFolder}/${safeFileName}`;
+    const storedName = `Gestion_Practicas/${userFolder}/${crypto.randomUUID()}-${safeFileName}`;
 
     const [uploadUrl] = await storage
         .bucket(bucketName)
@@ -95,6 +97,19 @@ async function generateSignedUrlByUser(params) {
     };
 }
 
+async function verifyUploadedFile(file) {
+    try {
+        const [metadata] = await storage.bucket(bucketName).file(file.storedName).getMetadata();
+        if (Number(metadata.size) !== Number(file.sizeBytes) || Number(metadata.size) > MAX_FILE_SIZE ||
+            metadata.contentType !== file.mimeType || !ALLOWED_MIME_TYPES.includes(metadata.contentType)) {
+            throw { status: 400, message: 'El archivo almacenado no coincide con el tamaño o tipo declarado.' };
+        }
+    } catch (error) {
+        if (error.code === 404) throw { status: 400, message: 'El archivo todavía no se encuentra en el almacenamiento.' };
+        throw error;
+    }
+}
+
 async function generateDownloadSignedUrl(storedName) {
     const [downloadUrl] = await storage
         .bucket(bucketName)
@@ -111,5 +126,6 @@ async function generateDownloadSignedUrl(storedName) {
 
 module.exports = {
     generateSignedUrlByUser,
-    generateDownloadSignedUrl
+    generateDownloadSignedUrl,
+    verifyUploadedFile
 };
