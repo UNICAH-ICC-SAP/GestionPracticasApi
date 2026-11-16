@@ -1,7 +1,6 @@
 'use strict';
 
 const db = require('../config/db');
-const Sequelize = require('sequelize');
 const DetallePeriodo = db.detalle_periodo;
 
 module.exports = {
@@ -23,40 +22,34 @@ async function findAll(req, res) {
                 id_periodo: id_periodo,
                 docenteId: docenteId
             },
-            attributes: [
-                'seccion',
-                'docenteId',
-                'id_periodo',
-                'hora_inicio',
-                'dia_inicio', 
-                'dia_final',
-                'hora_final',
-                [Sequelize.literal('`clase`.`id_clase`'), 'id_clase']
-            ],
             include: [
                 {
                     model: db.carrera_clase_bloque,
-                    as: 'clase',
-                    attributes: [] 
+                    as: 'ccb',
+                    attributes: ['id_clase']
                 }
-            ],
-            group: [
-                'seccion', 
-                'docenteId', 
-                'id_periodo', 
-                'hora_inicio', 
-                'dia_inicio', 
-                'dia_final', 
-                'hora_final', 
-                'clase.id_clase'
             ]
         });
 
-        res.status(200).send(resultados);
+        // Aplanar la respuesta para que id_clase esté en el nivel raíz
+        const data = resultados.map((item) => {
+            const plain = item.get({ plain: true });
+            return {
+                seccion: plain.seccion,
+                docenteId: plain.docenteId,
+                id_periodo: plain.id_periodo,
+                hora_inicio: plain.hora_inicio,
+                dia_inicio: plain.dia_inicio,
+                dia_final: plain.dia_final,
+                hora_final: plain.hora_final,
+                id_clase: plain.ccb ? String(plain.ccb.id_clase) : null
+            };
+        });
+
+        res.status(200).send(data);
     } catch (err) {
         res.status(500).send({
             message: err.message || "Error al obtener las clases con las relaciones."
         });
     }
 }
-

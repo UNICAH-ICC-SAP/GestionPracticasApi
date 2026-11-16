@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.7.0...v1.8.0) (2026-05-10)
+
+
+### Features
+
+* mejoras en rutas y controladores de ternas ([56e9f09](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/56e9f09f2253c1ae09487061a3202be10071a980))
+
+## [1.7.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.6.0...v1.7.0) (2026-05-10)
+
+
+### Features
+
+* mejoras en rutas y controladores ([8b348bf](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/8b348bfba2f5332dc6bf1d4a14043ae3d224a403))
+
+## [1.6.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.5.0...v1.6.0) (2026-05-06)
+
+
+### Features
+
+* adicion de configuraciones para modelos de archivos ([82cbf56](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/82cbf565a7a1c0ec9c461b16692248a01f9566eb))
+* adicion modelo, controlado y rutas para gestion de archivos, configuracion de gcp y token ([1d32645](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/1d3264530dd43c3d9f7bdb5c4508178edb1ddc3d))
+* eliminacion de archivos innecesarios ([1416e7a](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/1416e7a00f894901426fda3c19a3a4f095dad51d))
+
+## [1.5.0](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.14...v1.5.0) (2026-04-28)
+
+
+### Features
+
+* documentacion estudiante y mejoras en control de routas por roles y permisos ([8d1be90](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/8d1be90d9299d8388d0e5b836f906455093c692b))
+
+
+### Bug Fixes
+
+* deploy ([963978e](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/commit/963978e3c8cfa727d471649bff54a19076136e21))
+
 ### [1.4.14](https://github.com/UNICAH-ICC-SAP/GestionPracticasApi/compare/v1.4.13...v1.4.14) (2025-10-04)
 
 

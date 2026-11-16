@@ -4,7 +4,7 @@ const db = require('../config/db')
 const User = db.users;
 const { Op } = require('sequelize')
 const bcrypt = require('bcrypt');
-const service = require('../services/services');
+const service = require('../services/tokenService');
 
 module.exports = {
     signUp,
@@ -15,6 +15,7 @@ module.exports = {
 
 async function signUp(req, res) {
     let newPass = undefined;
+    console.log(req.body);
     await bcrypt.genSalt(10).then(async salts => {
         await bcrypt.hash(req.body['pass'], salts).then(hash => {
             newPass = hash;

@@ -11,8 +11,8 @@ App.use(
 );
 
 App.use(cors())
-App.use(express.json());
-App.use(express.urlencoded({ extended: false }));
+App.use(express.json({ limit: '50mb' }));
+App.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
 //TODO: put every controller here. const test = requires('./routes/test')
 const roleRoutes = require('./routes/roleRoutes');
@@ -20,9 +20,6 @@ const usuarioRoutes = require('./routes/userRoutes');
 const facultadRoutes = require('./routes/facultadRoutes');
 const docenteRoutes = require('./routes/docenteRoutes');
 const alumnoRoutes = require('./routes/alumnoRoutes');
-const documentacionRoutes = require('./routes/documentacionRoutes');
-const detalleDocumentacionRoutes = require('./routes/detalleDocumentacionRoutes');
-const documentoRoutes = require('./routes/docenteRoutes');
 const ternaRoutes = require('./routes/ternaRoutes');
 const detalleTernaRoutes = require('./routes/detalleTernaRoutes');
 const pensumRoutes = require('./routes/pensumRoutes');
@@ -31,6 +28,13 @@ const seccionesRoutes = require('./routes/seccionesRoutes');
 const clasesDocenteRoutes = require('./routes/clasesDocentesRoutes');
 const correoRoutes = require('./routes/enviarCorreoRoutes');
 const plantillaAccionRoutes = require('./routes/plantillaAccionRoutes');
+const userPermissionRoutes = require('./routes/userPermissionRoutes')
+const rolePermissionRoutes = require('./routes/rolePermissionsRoutes')
+const fileRoutes = require('./routes/fileRoutes');
+const reporteRoutes = require('./routes/reportesRoutes');
+const horarioDisponibilidadRoutes = require('./routes/horarioDisponibilidadRoutes');
+const comentarioRoutes = require('./routes/comentarioRoutes');
+
 
 //TODO: Put every route file here. App.use('api/test', test);
 App.use('/api/role', roleRoutes);
@@ -38,18 +42,19 @@ App.use('/api/user', usuarioRoutes);
 App.use('/api/facultad', facultadRoutes);
 App.use('/api/docente', docenteRoutes);
 App.use('/api/alumno', alumnoRoutes);
-App.use('/api/documentacion', documentacionRoutes);
-App.use('/api/detalleDocumentacion', detalleDocumentacionRoutes);
-App.use('/api/documentos', documentoRoutes);
 App.use('/api/ternas', ternaRoutes);
 App.use('/api/detalleTernas', detalleTernaRoutes);
 App.use('/api/pensum', pensumRoutes);
 App.use('/api/periodo', periodoRoutes);
 App.use('/api/plantillaAccion', plantillaAccionRoutes);
-
 App.use('/api/secciones', seccionesRoutes);
 App.use('/api/clasesDocentes', clasesDocenteRoutes);
 App.use('/api/correo', correoRoutes);
-
+App.use('/api/userPermission', userPermissionRoutes);
+App.use('/api/rolePermission', rolePermissionRoutes);
+App.use('/api/files', fileRoutes);
+App.use('/api/reportes', reporteRoutes);
+App.use('/api/horario', horarioDisponibilidadRoutes);
+App.use('/api/comentarios', comentarioRoutes);
 
 module.exports = App;

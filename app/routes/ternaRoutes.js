@@ -7,6 +7,9 @@ const apiRoutes = express.Router();
 
 apiRoutes.get('/getTernas', auth.isAuth, async (req, res) => await ternaController.findAll(req, res))
     .get('/getTernaBy', auth.isAuth, async (req, res) => await ternaController.findBy(req, res))
+    .get('/getMonografiaCompleta', auth.isAuth, async (req, res) => await ternaController.getMonografiaCompleta(req, res))
+    .patch('/updateTerna', auth.isAuth, async (req, res) => await ternaController.updateTerna(req, res))
+    .patch('/cancelarTerna', auth.isAuth, async (req, res) => await ternaController.cancelarTerna(req, res))
     .post('/insert', auth.isAuth, async (req, res) => await ternaController.insert(req, res));
 
 module.exports = apiRoutes;

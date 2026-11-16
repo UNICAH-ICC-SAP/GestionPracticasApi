@@ -5,35 +5,66 @@ const Periodo = db.periodos;
 const DetallePeriodo = db.detalle_periodo;
 const CarreraClaseBloque = db.carrera_clase_bloque;
 const Clase = db.clases;
+const HorarioDisponibilidad = db.horario_disponibilidad;
 const { Op } = require('sequelize');
 
 module.exports = {
     get,
     insert,
     update,
-    deleteSection
+    deleteSection,
+    updateObservacion
 };
 
 async function get(req, res) {
-    const id_periodo = req.query.id_periodo;
-    DetallePeriodo.findAll({
-        where: { id_periodo: id_periodo }
-    })
-        .then(data => {
-            res.status(200).send(data);
-        })
-        .catch(error => {
-            res.status(500).send({
-                message: error.message || "Sucedió un error al obtener los registros de DetallePeriodos"
-            });
+    try {
+        const { id_periodo, docenteId, id_clase } = req.query;
+
+        if (!id_periodo) {
+            return res.status(400).send({ message: "Se requiere el id_periodo." });
+        }
+
+        const whereCondition = { id_periodo };
+
+        if (docenteId) {
+            whereCondition.docenteId = docenteId;
+        }
+
+        const includeConditions = [
+            {
+                model: CarreraClaseBloque,
+                as: 'ccb',
+                attributes: ['id_ccb', 'facultadId', 'id_bloque'],
+                include: [
+                    {
+                        model: Clase,
+                        attributes: ['id_clase', 'nombre_clase', 'creditos', 'TipoClase'],
+                        ...(id_clase ? { where: { id_clase } } : {})
+                    }
+                ]
+            }
+        ];
+
+        const resultados = await DetallePeriodo.findAll({
+            where: whereCondition,
+            include: includeConditions,
+            order: [['hora_inicio', 'ASC']]
         });
+
+        res.status(200).send(resultados);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: error.message || "Error al obtener las secciones."
+        });
+    }
 }
 
 async function insert(req, res) {
     try {
         const {
             id_clase, hora_inicio, hora_final, docenteId,
-            dia_inicio, dia_final, horario_especial
+            dia_inicio, dia_final, horario_especial, observacion
         } = req.body;
 
         // 1. Obtener el periodo actual
@@ -189,6 +220,47 @@ async function insert(req, res) {
             });
         }
 
+        // 6.1 Validar disponibilidad del docente
+        const [horaInicioHoras, horaInicioMinutos] = hora_inicio.split(':').map(Number);
+        const [horaFinalHoras, horaFinalMinutos] = horaFinalGenerada.split(':').map(Number);
+        const minutosInicio = horaInicioHoras * 60 + horaInicioMinutos;
+        const minutosFin = horaFinalHoras * 60 + horaFinalMinutos;
+
+        let advertenciaDisponibilidad = null;
+
+        for (let dia = dia_inicio; dia <= dia_final; dia++) {
+            const disponibilidad = await HorarioDisponibilidad.findAll({
+                where: {
+                    docenteId,
+                    dia,
+                    tipo: 'clase'
+                }
+            });
+
+            if (!disponibilidad || disponibilidad.length === 0) {
+                advertenciaDisponibilidad = "Uno de los días que marcó, a esta hora el docente no está disponible. Comuníquese con el docente para verificar el error.";
+                break;
+            }
+
+            let cubierto = false;
+            for (const disp of disponibilidad) {
+                const [dispInicioH, dispInicioM] = disp.franja_inicio.split(':').map(Number);
+                const [dispFinH, dispFinM] = disp.franja_fin.split(':').map(Number);
+                const dispMinutosInicio = dispInicioH * 60 + dispInicioM;
+                const dispMinutosFin = dispFinH * 60 + dispFinM;
+
+                if (dispMinutosInicio <= minutosInicio && dispMinutosFin >= minutosFin) {
+                    cubierto = true;
+                    break;
+                }
+            }
+
+            if (!cubierto) {
+                advertenciaDisponibilidad = "Uno de los días que marcó, a esta hora el docente no está disponible. Comuníquese con el docente para verificar el error.";
+                break;
+            }
+        }
+
         // 7. Generación de la sección automáticamente
         const ultimaSeccion = await DetallePeriodo.findOne({
             include: [{
@@ -219,12 +291,17 @@ async function insert(req, res) {
                 hora_final: horaFinalGenerada,
                 dia_inicio,
                 dia_final,
-                seccion: seccion
+                seccion: seccion,
+                observacion: observacion || null
             });
             registrosInsertados.push(detalle);
         }
 
-        return res.status(201).json({ message: "Registros creados exitosamente", registros: registrosInsertados });
+        return res.status(201).json({
+            message: "Registros creados exitosamente",
+            registros: registrosInsertados,
+            ...(advertenciaDisponibilidad ? { warning: advertenciaDisponibilidad } : {})
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Error al procesar la solicitud", error });
@@ -235,7 +312,7 @@ async function update(req, res) {
     try {
         const {
             id_clase, hora_inicio, hora_final, docenteId,
-            dia_inicio, dia_final, horario_especial, seccion
+            dia_inicio, dia_final, horario_especial, seccion, observacion
         } = req.body;
 
         // Validaciones de parámetros requeridos
@@ -415,6 +492,47 @@ async function update(req, res) {
             }
         }
 
+        // 6.1 Validar disponibilidad del docente
+        const [horaInicioHorasUpd, horaInicioMinutosUpd] = hora_inicio.split(':').map(Number);
+        const [horaFinalHorasUpd, horaFinalMinutosUpd] = horaFinalGenerada.split(':').map(Number);
+        const minutosInicioUpd = horaInicioHorasUpd * 60 + horaInicioMinutosUpd;
+        const minutosFinUpd = horaFinalHorasUpd * 60 + horaFinalMinutosUpd;
+
+        let advertenciaDisponibilidadUpd = null;
+
+        for (let dia = dia_inicio; dia <= dia_final; dia++) {
+            const disponibilidad = await HorarioDisponibilidad.findAll({
+                where: {
+                    docenteId,
+                    dia,
+                    tipo: 'clase'
+                }
+            });
+
+            if (!disponibilidad || disponibilidad.length === 0) {
+                advertenciaDisponibilidadUpd = "Uno de los días que marcó, a esta hora el docente no está disponible. Comuníquese con el docente para verificar el error.";
+                break;
+            }
+
+            let cubierto = false;
+            for (const disp of disponibilidad) {
+                const [dispInicioH, dispInicioM] = disp.franja_inicio.split(':').map(Number);
+                const [dispFinH, dispFinM] = disp.franja_fin.split(':').map(Number);
+                const dispMinutosInicio = dispInicioH * 60 + dispInicioM;
+                const dispMinutosFin = dispFinH * 60 + dispFinM;
+
+                if (dispMinutosInicio <= minutosInicioUpd && dispMinutosFin >= minutosFinUpd) {
+                    cubierto = true;
+                    break;
+                }
+            }
+
+            if (!cubierto) {
+                advertenciaDisponibilidadUpd = "Uno de los días que marcó, a esta hora el docente no está disponible. Comuníquese con el docente para verificar el error.";
+                break;
+            }
+        }
+
         // 7. Manejo de sección
         let nuevaSeccion = seccion; // Por defecto mantiene la sección original
 
@@ -461,6 +579,9 @@ async function update(req, res) {
             detalle.dia_inicio = dia_inicio;
             detalle.dia_final = dia_final;
             detalle.seccion = nuevaSeccion;
+            if (observacion !== undefined) {
+                detalle.observacion = observacion;
+            }
 
             await detalle.save();
             registrosActualizados.push(detalle);
@@ -468,7 +589,8 @@ async function update(req, res) {
 
         return res.status(200).json({
             message: "Registros actualizados exitosamente",
-            registros: registrosActualizados
+            registros: registrosActualizados,
+            ...(advertenciaDisponibilidadUpd ? { warning: advertenciaDisponibilidadUpd } : {})
         });
 
     } catch (error) {
@@ -535,6 +657,38 @@ async function deleteSection(req, res) {
         console.error(error);
         return res.status(500).json({
             message: "Error al procesar la solicitud de eliminación",
+            error
+        });
+    }
+}
+
+async function updateObservacion(req, res) {
+    try {
+        const { id_detalle, observacion } = req.body;
+
+        if (!id_detalle) {
+            return res.status(400).json({ message: "Se requiere id_detalle." });
+        }
+
+        const detalle = await DetallePeriodo.findOne({
+            where: { id_detalle }
+        });
+
+        if (!detalle) {
+            return res.status(404).json({ message: "Registro no encontrado." });
+        }
+
+        detalle.observacion = observacion || null;
+        await detalle.save();
+
+        return res.status(200).json({
+            message: "Observación actualizada exitosamente",
+            registro: detalle
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Error al actualizar la observación",
             error
         });
     }

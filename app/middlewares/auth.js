@@ -1,5 +1,5 @@
 'use strict'
-const services = require('../services/services')
+const services = require('../services/tokenService')
 // const moment = require('moment')
 
 function isAuth(req, res, next) {
