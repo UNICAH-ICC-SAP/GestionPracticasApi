@@ -1,31 +1,28 @@
-'use strict'
+'use strict';
 
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
     const attributes = {
-        documentoId: {
-            type: DataTypes.STRING(255),
+        permissionId: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
             primaryKey: true
         },
-        nombreArchivo: {
-            type: DataTypes.STRING(50)
+        name: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+            unique: true
         },
-        ruta: {
-            type: DataTypes.STRING(255)
-        },
-    }
+        description: {
+            type: DataTypes.STRING(255),
+            allowNull: true
+        }
+    };
     const options = {
-        defaultScope: {
-            //TODO: Exclude attributes by default here
-            attributes: { exclude: ['createdAt', 'updatedAt'] }
-        },
-        scopes: {
-            //TODO: Includes attributes for scopes here
-        },
-        tableName: 'user',
-        timestamps: 'false'
-    }
+        tableName: 'permissions',
+        timestamps: false
+    };
 
-    return sequelize.define('users', attributes, options);
-}
+    return sequelize.define('permissions', attributes, options);
+};
