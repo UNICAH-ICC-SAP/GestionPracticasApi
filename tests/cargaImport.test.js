@@ -7,7 +7,7 @@ jest.mock('../app/config/db', () => ({
     clases: { findAll: jest.fn() },
     carrera_clase_bloque: { findAll: jest.fn() },
     detalle_periodo: { findAll: jest.fn(), bulkCreate: jest.fn() },
-    sequelize: { transaction: jest.fn() }
+    sequelize: { transaction: jest.fn(), getQueryInterface: jest.fn() }
 }));
 
 const db = require('../app/config/db');
@@ -28,7 +28,26 @@ beforeEach(() => {
     db.clases.findAll.mockResolvedValue([{ id_clase: 'IF101', nombre_clase: 'Informática I' }]);
     db.carrera_clase_bloque.findAll.mockResolvedValue([{ id_ccb: 1, id_clase: 'IF101', facultadId: 'INF', id_bloque: 1 }]);
     db.detalle_periodo.findAll.mockResolvedValue([]);
+    db.sequelize.getQueryInterface.mockReturnValue({ describeTable: jest.fn().mockResolvedValue({ observacion: {} }) });
     db.sequelize.transaction.mockImplementation(async (options, callback) => callback({ LOCK: { UPDATE: 'UPDATE' } }));
+});
+
+test('preview works on legacy schemas without selecting the missing observation column', async () => {
+    db.sequelize.getQueryInterface.mockReturnValue({ describeTable: jest.fn().mockResolvedValue({ id_detalle: {} }) });
+    const result = await service.prepare([row], 'III-2026', 'INF');
+    const query = db.detalle_periodo.findAll.mock.calls[0][0];
+    expect(query.attributes).not.toContain('observacion');
+    expect(result.filas[0].errores).toEqual([]);
+    expect(result.filas[0].advertencias.join(' ')).toContain('Falta actualizar la base de datos');
+    expect(db.detalle_periodo.bulkCreate).not.toHaveBeenCalled();
+});
+
+test('confirmation reports the missing migration before attempting an insert', async () => {
+    db.sequelize.getQueryInterface.mockReturnValue({ describeTable: jest.fn().mockResolvedValue({ id_detalle: {} }) });
+    await expect(service.confirm([row], 'III-2026', 'INF')).rejects.toMatchObject({
+        status: 503, message: expect.stringContaining('npm run migrate:secciones')
+    });
+    expect(db.detalle_periodo.bulkCreate).not.toHaveBeenCalled();
 });
 
 test('parses SAP assignments across page headers and preserves nonconsecutive days', () => {

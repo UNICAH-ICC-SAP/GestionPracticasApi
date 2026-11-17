@@ -31,11 +31,18 @@ async function prepare(rows, id_periodo, facultadId, transaction) {
         transaction, ...(transaction ? { lock: transaction.LOCK.UPDATE } : {})
     });
     if (!period) throw { status: 400, message: 'El período seleccionado no existe.' };
+    const columns = await db.sequelize.getQueryInterface().describeTable('detalle_periodo', { transaction });
+    const hasObservation = Boolean(columns.observacion);
+    if (transaction && !hasObservation) {
+        throw { status: 503, message: 'La base de datos necesita actualizarse antes de importar. Ejecuta npm run migrate:secciones en el entorno de la API.' };
+    }
+    const attributes = ['id_ccb', 'docenteId', 'seccion', 'dia_inicio', 'dia_final', 'hora_inicio', 'hora_final'];
+    if (hasObservation) attributes.push('observacion');
     const [teachers, blocks, courses, existing] = await Promise.all([
         db.docente.findAll({ attributes: ['docenteId', 'nombre', 'estadoDocente'], transaction }),
         db.carrera_clase_bloque.findAll({ where: { facultadId }, transaction }),
         db.clases.findAll({ attributes: ['id_clase', 'nombre_clase'], transaction }),
-        db.detalle_periodo.findAll({ where: { id_periodo }, transaction })
+        db.detalle_periodo.findAll({ attributes, where: { id_periodo }, transaction })
     ]);
     const teacherMap = new Map(teachers.map(teacher => [String(teacher.docenteId), teacher]));
     const courseMap = new Map(courses.map(course => [normalize(course.id_clase), course]));
@@ -54,6 +61,7 @@ async function prepare(rows, id_periodo, facultadId, transaction) {
         const row = Object.fromEntries(COLUMNS.map(key => [key, String(source[key] ?? '').trim()]));
         const errors = [];
         const warnings = [];
+        if (!hasObservation) warnings.push('Falta actualizar la base de datos para confirmar la importación. Puedes revisar y descargar el Excel; las cargas existentes se comparan usando las fechas del período.');
         const code = normalize(row.codigo).split('-').pop();
         const teacher = teacherMap.get(row.docenteId);
         const course = courseMap.get(code);
