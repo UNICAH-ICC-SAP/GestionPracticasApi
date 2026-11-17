@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest --runInBand",
     "dev": "nodemon index.js",
+    "migrate:secciones": "node app/migrations/addSeccionesObservacion.js",
     "lint": "eslint .",
     "release": "standard-version && git push -f --follow-tags --no-verify",
     "prepare": "husky",
