@@ -40,7 +40,7 @@ async function prepare(rows, id_periodo, facultadId, transaction) {
     if (hasObservation) attributes.push('observacion');
     const [teachers, blocks, courses, existing] = await Promise.all([
         db.docente.findAll({ attributes: ['docenteId', 'nombre', 'estadoDocente'], transaction }),
-        db.carrera_clase_bloque.findAll({ where: { facultadId }, transaction }),
+        db.carrera_clase_bloque.findAll({ ...(facultadId === '*' ? {} : { where: { facultadId } }), transaction }),
         db.clases.findAll({ attributes: ['id_clase', 'nombre_clase'], transaction }),
         db.detalle_periodo.findAll({ attributes, where: { id_periodo }, transaction })
     ]);
@@ -72,8 +72,10 @@ async function prepare(rows, id_periodo, facultadId, transaction) {
         if (teacher && row.nombre_docente && normalize(row.nombre_docente) !== normalize(teacher.nombre)) {
             warnings.push(`Nombre en catálogo: ${teacher.nombre}. Se utiliza el identificador ${row.docenteId}.`);
         }
-        if (!course || !matching.length) errors.push('Asignatura sin bloque en la carrera seleccionada.');
-        if (matching.length > 1) warnings.push(`Se crearán horarios en ${matching.length} bloques de la carrera.`);
+        if (!course || !matching.length) errors.push(facultadId === '*'
+            ? 'Asignatura sin bloque en ninguna carrera del catálogo.'
+            : 'Asignatura sin bloque en la carrera seleccionada.');
+        if (matching.length > 1) warnings.push(`Se crearán horarios en ${matching.length} bloques de las carreras de destino.`);
         if (course && row.nombre_clase && normalize(row.nombre_clase) !== normalize(course.nombre_clase)) {
             warnings.push(`Asignatura en catálogo: ${course.nombre_clase}.`);
         }
@@ -128,7 +130,8 @@ async function prepare(rows, id_periodo, facultadId, transaction) {
             }
             if (!errors.length) pending.push(...generated);
         }
-        output.push({ ...row, fila: index + 1, errores: [...new Set(errors)], advertencias: warnings });
+        output.push({ ...row, fila: index + 1, errores: [...new Set(errors)], advertencias: warnings,
+            destinos: [...new Set(matching.map(block => `${block.facultadId} · Bloque ${block.id_bloque}`))] });
     }
     return { filas: output, registros: pending, duplicados: duplicates };
 }

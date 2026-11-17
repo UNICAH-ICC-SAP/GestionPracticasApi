@@ -50,6 +50,40 @@ test('confirmation reports the missing migration before attempting an insert', a
     expect(db.detalle_periodo.bulkCreate).not.toHaveBeenCalled();
 });
 
+test('all careers expands shared subjects and preserves destinations without false teacher conflicts', async () => {
+    db.carrera_clase_bloque.findAll.mockResolvedValue([
+        { id_ccb: 1, id_clase: 'IF101', facultadId: 'INF', id_bloque: 1 },
+        { id_ccb: 2, id_clase: 'IF101', facultadId: 'IND', id_bloque: 2 }
+    ]);
+    const preview = await service.prepare([row], 'III-2026', '*');
+    expect(db.carrera_clase_bloque.findAll.mock.calls[0][0]).not.toHaveProperty('where');
+    expect(preview.filas[0].errores).toEqual([]);
+    expect(preview.filas[0].destinos).toEqual(['INF · Bloque 1', 'IND · Bloque 2']);
+    expect(preview.registros).toHaveLength(4);
+    const result = await service.confirm([row], 'III-2026', '*');
+    expect(result.insertados).toBe(4);
+    db.detalle_periodo.findAll.mockResolvedValue(preview.registros);
+    expect(await service.confirm([row], 'III-2026', '*')).toEqual({ insertados: 0, duplicados: 4 });
+});
+
+test('all careers still rejects simultaneous assignments of one teacher to different subjects', async () => {
+    db.clases.findAll.mockResolvedValue([{ id_clase: 'IF101' }, { id_clase: 'IN102' }]);
+    db.carrera_clase_bloque.findAll.mockResolvedValue([
+        { id_ccb: 1, id_clase: 'IF101', facultadId: 'INF', id_bloque: 1 },
+        { id_ccb: 2, id_clase: 'IN102', facultadId: 'IND', id_bloque: 2 }
+    ]);
+    await expect(service.confirm([row, { ...row, codigo: 'IND1-IN102' }], 'III-2026', '*'))
+        .rejects.toMatchObject({ status: 409 });
+    expect(db.detalle_periodo.bulkCreate).not.toHaveBeenCalled();
+});
+
+test('all careers reports subjects that have no destination in the catalog', async () => {
+    db.carrera_clase_bloque.findAll.mockResolvedValue([]);
+    const result = await service.prepare([row], 'III-2026', '*');
+    expect(result.filas[0].errores).toContain('Asignatura sin bloque en ninguna carrera del catálogo.');
+    expect(result.registros).toEqual([]);
+});
+
 test('parses SAP assignments across page headers and preserves nonconsecutive days', () => {
     const rows = parser.parseSapText(`#1 - 9599 : Ariel
 Creditos: 3 Clases: 1

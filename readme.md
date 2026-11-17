@@ -19,6 +19,12 @@ fechas y conflictos de horarios; permite seleccionar las filas válidas para con
 La confirmación vuelve a validar y guarda toda la selección en una transacción.
 Las cargas existentes se conservan y los horarios idénticos se omiten.
 
+La opción **Todas las carreras** procesa el archivo completo. Cada asignatura se
+asocia con todos los bloques donde existe en el catálogo, incluso si es compartida
+por varias carreras. La vista previa muestra los códigos de carrera y bloques de
+destino por fila. Se mantienen las validaciones de conflictos y duplicados entre
+carreras. Para limitar la importación, seleccionar una carrera específica.
+
 Se admite PDF SAP con texto (hasta 250 páginas) y Excel `.xlsx`, máximo 10 MB y
 3000 asignaciones. Los PDF escaneados necesitan reconocimiento de texto previo.
 **Descargar datos en Excel** convierte la vista previa del PDF a una tabla editable;
