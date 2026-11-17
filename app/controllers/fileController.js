@@ -4,11 +4,19 @@
 const db = require('../config/db');
 const UploadedFile = db.file;
 
-const { generateSignedUrlByUser, generateDownloadSignedUrl } = require('../services/gcpBucketService');
+const { generateSignedUrlByUser, generateDownloadSignedUrl, verifyUploadedFile } = require('../services/gcpBucketService');
+const { canAccessStudent } = require('../services/accessService');
+
+async function requireFileAccess(req, userId) {
+    if (!userId || !await canAccessStudent(req.user, userId)) {
+        throw { status: 403, message: 'No tienes permiso para acceder a estos documentos.' };
+    }
+}
 
 async function createSignedUrlUser(req, res) {
     try {
         const { userId, userName, file, fileTypeId, customFileName } = req.body;
+        await requireFileAccess(req, userId);
 
         if (!file) {
             return res.status(400).send({
@@ -21,7 +29,7 @@ async function createSignedUrlUser(req, res) {
             userName,
             file: {
                 ...file,
-                fileName: customFileName
+                fileName: customFileName || file.fileName
             },
         });
 
@@ -37,7 +45,7 @@ async function createSignedUrlUser(req, res) {
             bucketName: signedFile.bucketName,
             fileUrl: signedFile.fileUrl,
             status: 'PENDING',
-            fileStatus: 'DELIVERED',
+            fileStatus: 'PENDING',
             fileTypeId
         });
 
@@ -57,7 +65,7 @@ async function createSignedUrlUser(req, res) {
     } catch (error) {
         console.error(error);
 
-        return res.status(400).send({
+        return res.status(error.status || 400).send({
             message: error.message || 'Error al generar URL firmada'
         });
     }
@@ -92,6 +100,11 @@ async function updateCreateSignedUrlUser(req, res) {
             });
         }
 
+        await requireFileAccess(req, currentFile.userId);
+        if (userId && String(userId) !== String(currentFile.userId)) {
+            return res.status(400).send({ message: 'No puedes cambiar el propietario de un archivo.' });
+        }
+
         const signedFile = await generateSignedUrlByUser({
             userId: userId || currentFile.userId,
             userName: userName || currentFile.userName,
@@ -113,7 +126,7 @@ async function updateCreateSignedUrlUser(req, res) {
             bucketName: signedFile.bucketName,
             fileUrl: signedFile.fileUrl,
             status: 'PENDING',
-            fileStatus: 'DELIVERED'
+            fileStatus: 'PENDING'
         });
 
         return res.status(200).send({
@@ -132,7 +145,7 @@ async function updateCreateSignedUrlUser(req, res) {
     } catch (error) {
         console.error(error);
 
-        return res.status(400).send({
+        return res.status(error.status || 400).send({
             message: error.message || 'Error al actualizar URL firmada'
         });
     }
@@ -156,6 +169,8 @@ async function getDownloadUrl(req, res) {
             });
         }
 
+        await requireFileAccess(req, archivo.userId);
+
         if (archivo.status !== 'UPLOADED') {
             return res.status(400).send({
                 message: 'El archivo aún no ha sido subido'
@@ -173,8 +188,8 @@ async function getDownloadUrl(req, res) {
     } catch (error) {
         console.error(error);
 
-        return res.status(500).send({
-            message: 'Error generando URL de descarga'
+        return res.status(error.status || 500).send({
+            message: error.status ? error.message : 'Error generando URL de descarga'
         });
     }
 }
@@ -191,6 +206,26 @@ async function updateFileStatus(req, res) {
             });
         }
 
+        await requireFileAccess(req, file.userId);
+        if ((status !== undefined && !['PENDING', 'UPLOADED', 'FAILED'].includes(status)) ||
+            (fileStatus !== undefined && !['PENDING', 'DELIVERED', 'CHANGE_REQUESTED'].includes(fileStatus)) ||
+            (status === undefined && fileStatus === undefined)) {
+            return res.status(400).send({ message: 'El estado del archivo no es válido.' });
+        }
+        if (fileStatus === 'CHANGE_REQUESTED' && Number(req.user.roleId) !== 1 && Number(req.user.roleId) !== 2) {
+            return res.status(403).send({ message: 'Solo el docente asignado puede solicitar cambios.' });
+        }
+        if (status === 'PENDING' || (file.status === 'UPLOADED' && status === 'FAILED')) {
+            return res.status(400).send({ message: 'Para iniciar otra carga debes solicitar una nueva URL.' });
+        }
+        if (fileStatus === 'DELIVERED' && file.fileStatus === 'CHANGE_REQUESTED' && Number(req.user.roleId) === 3) {
+            return res.status(400).send({ message: 'Sube una nueva versión para responder a la solicitud de cambios.' });
+        }
+        if (fileStatus !== undefined && fileStatus !== 'PENDING' && status !== 'UPLOADED' && file.status !== 'UPLOADED') {
+            return res.status(400).send({ message: 'El archivo debe estar subido antes de cambiar su revisión.' });
+        }
+        if (status === 'UPLOADED') await verifyUploadedFile(file);
+
         await file.update({
             status,
             fileStatus
@@ -203,8 +238,8 @@ async function updateFileStatus(req, res) {
     } catch (error) {
         console.error(error);
 
-        return res.status(500).send({
-            message: 'Error actualizando archivo'
+        return res.status(error.status || 500).send({
+            message: error.status ? error.message : 'Error actualizando archivo'
         });
     }
 }
@@ -212,6 +247,7 @@ async function updateFileStatus(req, res) {
 async function findAllByUser(req, res) {
     try {
         const { userId, status } = req.body;
+        await requireFileAccess(req, userId);
 
         if (!userId) {
             return res.status(400).send({
@@ -271,8 +307,8 @@ async function findAllByUser(req, res) {
     } catch (error) {
         console.error(error);
 
-        return res.status(500).send({
-            message: 'Error obteniendo archivos'
+        return res.status(error.status || 500).send({
+            message: error.status ? error.message : 'Error obteniendo archivos'
         });
     }
 }
