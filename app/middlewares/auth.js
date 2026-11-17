@@ -39,6 +39,18 @@ function requireAdmin(req, res, next) {
     return next();
 }
 
+function ownSections(req, res, next) {
+    if (isAdmin(req.user)) return next();
+    if (Number(req.user.roleId) !== 2) {
+        return res.status(403).send({ message: 'No tienes permiso para consultar las secciones.' });
+    }
+    if (req.query.docenteId !== undefined && String(req.query.docenteId) !== String(req.user.userId)) {
+        return res.status(403).send({ message: 'Solo puedes consultar tu propia carga académica.' });
+    }
+    req.query.docenteId = req.user.userId;
+    return next();
+}
+
 function requirePermission(name) {
     return async (req, res, next) => {
         try {
@@ -78,4 +90,4 @@ function ownPermissions(field) {
     };
 }
 
-module.exports = { isAuth, whoAmI, requireAdmin, requirePermission, scopeQuery, ownPermissions };
+module.exports = { isAuth, whoAmI, requireAdmin, requirePermission, scopeQuery, ownPermissions, ownSections };

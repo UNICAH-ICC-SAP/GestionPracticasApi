@@ -3,6 +3,9 @@
   "version": "1.8.0",
   "description": "Api para Gestion de Clases",
   "main": "index.js",
+  "engines": {
+    "node": ">=22.3.0"
+  },
   "scripts": {
     "test": "jest --runInBand",
     "dev": "nodemon index.js",
@@ -30,15 +33,17 @@
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "exceljs": "4.4.0",
     "express": "^4.19.2",
     "he": "^1.2.0",
     "jwt-simple": "^0.5.6",
     "lodash": "^4.17.21",
     "mysql2": "^3.11.3",
     "nodemailer": "^6.9.16",
+    "pdf-parse": "2.4.5",
+    "pdfkit": "^0.19.1",
     "sequelize": "^6.37.5",
-    "uuid": "^14.0.0",
-    "pdfkit": "^0.19.1"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.5.0",

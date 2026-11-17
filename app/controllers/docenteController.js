@@ -57,10 +57,13 @@ async function findAll(req, res) {
 }
 async function findBy(req, res) {
     Docente.findAll({
-        where: { ...req.query, ...req.accessScope },
+        where: { [db.Sequelize.Op.and]: [req.query, req.accessScope || {}] },
         include: [{ model: Facultad }]
     })
         .then(data => {
+            if (!data.length) {
+                return res.status(404).send({ message: 'Docente no encontrado.' });
+            }
             const newData = {
                 userId: data[0].docenteId,
                 email: data[0].email,

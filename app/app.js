@@ -50,5 +50,6 @@ App.use('/api/correo', correoRoutes);
 App.use('/api/userPermission', userPermissionRoutes);
 App.use('/api/rolePermission', rolePermissionRoutes);
 App.use('/api/files', fileRoutes);
+App.use('/api/cargas/importar', require('./routes/cargaImportRoutes'));
 
 module.exports = App;

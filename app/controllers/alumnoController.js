@@ -64,7 +64,7 @@ async function findAllData(req, res) {
 }
 
 async function findBy(req, res) {
-    Alumno.findAll({ where: req.query, include: [{ model: Facultad }] })
+    Alumno.findAll({ where: { ...req.query, ...req.accessScope }, include: [{ model: Facultad }] })
 
         .then(data => {
             const newData = {

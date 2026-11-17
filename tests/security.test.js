@@ -14,6 +14,7 @@ jest.mock('../app/config/db', () => ({
     file: { findByPk: jest.fn(), findOne: jest.fn(), create: jest.fn(), findAll: jest.fn() },
     plantilla_correo: { findAll: jest.fn(), findByPk: jest.fn(), update: jest.fn() },
     accionCorreo: { findOne: jest.fn() },
+    detalle_periodo: { findAll: jest.fn() },
     sequelizeInstance: { transaction: jest.fn() }
 }));
 
@@ -50,6 +51,8 @@ beforeAll(async () => {
     app.use('/ternas', require('../app/routes/ternaRoutes'));
     app.use('/detalle', require('../app/routes/detalleTernaRoutes'));
     app.use('/correo', require('../app/routes/enviarCorreoRoutes'));
+    app.use('/secciones', require('../app/routes/seccionesRoutes'));
+    app.use('/cargas/importar', require('../app/routes/cargaImportRoutes'));
     await new Promise(resolve => { server = app.listen(0, '127.0.0.1', resolve); });
     baseUrl = `http://127.0.0.1:${server.address().port}`;
 });
@@ -104,11 +107,42 @@ async function request(method, path, body, userId, token) {
     return { status: response.status, body: await response.json() };
 }
 
+test('teachers can read their sections but cannot impersonate another teacher', async () => {
+    db.detalle_periodo.findAll.mockResolvedValue([]);
+    expect((await request('GET', '/secciones/getSections?id_periodo=III-2026', undefined, '2')).status).toBe(200);
+    expect(db.detalle_periodo.findAll).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id_periodo: 'III-2026', docenteId: '2' }
+    }));
+    db.detalle_periodo.findAll.mockClear();
+    expect((await request('GET', '/secciones/getSections?id_periodo=III-2026&docenteId=1', undefined, '2')).status).toBe(403);
+    expect((await request('GET', '/secciones/getSections?id_periodo=III-2026', undefined, '3')).status).toBe(403);
+    expect(db.detalle_periodo.findAll).not.toHaveBeenCalled();
+});
+
+test('administrators retain section access and teachers cannot mutate sections', async () => {
+    db.detalle_periodo.findAll.mockResolvedValue([]);
+    expect((await request('GET', '/secciones/getSections?id_periodo=III-2026', undefined, '1')).status).toBe(200);
+    expect(db.detalle_periodo.findAll).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id_periodo: 'III-2026' }
+    }));
+    for (const [method, path] of [['POST', 'insertSection'], ['PUT', 'updateSection'], ['DELETE', 'deleteSection']]) {
+        expect((await request(method, `/secciones/${path}`, {}, '2')).status).toBe(403);
+    }
+});
+
 test('password reset and account creation reject anonymous requests', async () => {
     expect((await request('PUT', '/user/resetPassword', { newPassword: 'New-password-123' })).status).toBe(401);
     expect((await request('POST', '/user/signUp', { userId: '6', accountType: 'alumno' })).status).toBe(401);
     expect(db.users.update).not.toHaveBeenCalled();
     expect(db.users.create).not.toHaveBeenCalled();
+});
+
+test('academic import preview, confirm and export require an administrator', async () => {
+    for (const endpoint of ['preview', 'confirm', 'excel']) {
+        expect((await request('POST', `/cargas/importar/${endpoint}`, {})).status).toBe(401);
+        expect((await request('POST', `/cargas/importar/${endpoint}`, {}, '2')).status).toBe(403);
+        expect((await request('POST', `/cargas/importar/${endpoint}`, {}, '3')).status).toBe(403);
+    }
 });
 
 test('students cannot create accounts or grant role/user permissions', async () => {
@@ -234,6 +268,9 @@ test('students cannot inspect other user permissions', async () => {
 });
 
 test('read filters cannot override the authenticated student scope', async () => {
+    db.alumno.findAll.mockResolvedValue([{ alumnoId: '3', nombre: 'Alumno' }]);
+    expect((await request('GET', '/alumno/getAlumnosBy?alumnoId=4', undefined, '3')).status).toBe(201);
+    expect(db.alumno.findAll).toHaveBeenCalledWith(expect.objectContaining({ where: { alumnoId: '3' } }));
     await request('GET', '/alumno/getAllData?alumnoId=4', undefined, '3');
     expect(db.alumno.findAll).toHaveBeenCalledWith(expect.objectContaining({ where: { alumnoId: '3' } }));
     await request('GET', '/ternas/getTernaBy?alumnoId=4', undefined, '3');
@@ -250,6 +287,30 @@ test('teacher lists preserve the faculty filter and authenticated access scope',
             docenteId: { [db.Sequelize.Op.in]: ['3'] }
         }
     }));
+});
+
+test('profile lookup preserves the requested teacher within the allowed teachers', async () => {
+    db.terna.findAll.mockResolvedValue([{ ternaId: 7 }]);
+    db.detalleTerna.findAll.mockImplementation(async options =>
+        options.attributes.includes('docenteId') ? [{ docenteId: '9599' }, { docenteId: '1000' }] : [{ ternaId: 7 }]);
+    db.docente.findAll.mockResolvedValue([{ docenteId: '9599', nombre: 'Ariel Antonio Calix Vásquez' }]);
+
+    const result = await request('GET', '/docente/getDocentesBy?docenteId=9599', undefined, '2');
+
+    expect(result.status).toBe(201);
+    expect(result.body).toMatchObject({ userId: '9599', nombre: 'Ariel Antonio Calix Vásquez' });
+    expect(db.docente.findAll).toHaveBeenCalledWith(expect.objectContaining({
+        where: { [db.Sequelize.Op.and]: [
+            { docenteId: '9599' },
+            { docenteId: { [db.Sequelize.Op.in]: ['2', '9599', '1000'] } }
+        ] }
+    }));
+});
+
+test('an unavailable teacher profile returns 404 instead of selecting another profile', async () => {
+    const result = await request('GET', '/docente/getDocentesBy?docenteId=9599', undefined, '2');
+    expect(result.status).toBe(404);
+    expect(result.body.nombre).toBeUndefined();
 });
 
 test('explicit permission denial takes precedence over a role grant', async () => {
